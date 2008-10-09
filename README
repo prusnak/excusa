@@ -1,0 +1,10 @@
+
+ EXCUSA - Effective XML Communication Using SOAP and Automata
+
+ Usage: excusa file|URI [outputdir]
+
+     file|URI        location of Web Services Description Language file
+     outputdir       output directory (default = webservice name)
+
+ http://stick.gk2.sk/projects/excusa/
+

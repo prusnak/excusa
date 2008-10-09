@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Class-Path: qname.jar wsdl4j.jar xmlschema.jar
+Created-By: STiCK
+Name: sk/gk2/excusa/
+Specification-Title: Effective XML
+Specification-Version: 0.1
+Specification-Vendor: STiCK
+Implementation-Title: sk.gk2.excusa
+Implementation-Version: 0
+Implementation-Vendor: STiCK
+Main-Class: sk.gk2.excusa.Main

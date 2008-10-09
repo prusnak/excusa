@@ -1,0 +1,4 @@
+#!/bin/sh
+script=`which $0`
+dir=`dirname $script`
+java -jar $dir/lib/excusa.jar $*
