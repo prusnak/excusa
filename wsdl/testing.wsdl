@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://localhost/" targetNamespace="http://localhost/">
+
+    <wsdl:types>
+        <s:schema targetNamespace="http://localhost/">
+
+            <s:complexType name="ComplexNumber">
+                <s:sequence>
+                    <s:element name="re" type="s:double"/>
+                    <s:element name="im" type="s:double"/>
+                </s:sequence>
+            </s:complexType>
+
+            <s:element name="Complex" type="tns:ComplexNumber"/>
+
+            <s:element name="IntArray">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="unbounded" name="val" type="s:int"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+
+            <s:element name="ComplexArray">
+                <s:complexType>
+                    <s:sequence>
+                        <s:element minOccurs="0" maxOccurs="unbounded" name="val"
+                            type="tns:ComplexNumber"/>
+                    </s:sequence>
+                </s:complexType>
+            </s:element>
+
+        </s:schema>
+    </wsdl:types>
+
+    <wsdl:message name="IntResult">
+        <wsdl:part name="ret" type="s:int"/>
+    </wsdl:message>
+
+    <wsdl:message name="IntArgs">
+        <wsdl:part name="args" element="tns:IntArray"/>
+    </wsdl:message>
+
+    <wsdl:message name="ComplexResult">
+        <wsdl:part name="ret" element="tns:Complex"/>
+    </wsdl:message>
+
+    <wsdl:message name="ComplexArgs">
+        <wsdl:part name="args" element="tns:ComplexArray"/>
+    </wsdl:message>
+
+    <wsdl:portType name="TestingSoap">
+
+        <wsdl:operation name="AddInt">
+            <wsdl:input message="tns:IntArgs"/>
+            <wsdl:output message="tns:IntResult"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="AddComplex">
+            <wsdl:input message="tns:ComplexArgs"/>
+            <wsdl:output message="tns:ComplexResult"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="MultiplyInt">
+            <wsdl:input message="tns:IntArgs"/>
+            <wsdl:output message="tns:IntResult"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="MultiplyComplex">
+            <wsdl:input message="tns:ComplexArgs"/>
+            <wsdl:output message="tns:ComplexResult"/>
+        </wsdl:operation>
+
+    </wsdl:portType>
+
+    <wsdl:binding name="TestingSoap" type="tns:TestingSoap">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+
+        <wsdl:operation name="AddInt">
+            <soap:operation soapAction="http://localhost/Add"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="AddComplex">
+            <soap:operation soapAction="http://localhost/AddComplex"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="MultiplyInt">
+            <soap:operation soapAction="http://localhost/Multiply"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="MultiplyComplex">
+            <soap:operation soapAction="http://localhost/MultiplyComplex"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+    </wsdl:binding>
+
+    <wsdl:service name="Testing">
+        <wsdl:port name="TestingSoap" binding="tns:TestingSoap">
+            <soap:address location="http://localhost/testing.asmx"/>
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

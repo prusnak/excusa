@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://xmlme.com/WebServices" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://xmlme.com/WebServices" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://xmlme.com/WebServices">
+      <s:element name="GetCustomNews">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Topic" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomNewsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCustomNewsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetCustomNewsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCustomNews" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomNewsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCustomNewsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomNewsHttpGetIn">
+    <wsdl:part name="Topic" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomNewsHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomNewsHttpPostIn">
+    <wsdl:part name="Topic" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomNewsHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:portType name="GetCustomNewsSoap">
+    <wsdl:operation name="GetCustomNews">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Submit a News Topic and a List of Articles will be returned in XML from the Moreover News Service.</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomNewsSoapIn" />
+      <wsdl:output message="tns:GetCustomNewsSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="GetCustomNewsHttpGet">
+    <wsdl:operation name="GetCustomNews">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Submit a News Topic and a List of Articles will be returned in XML from the Moreover News Service.</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomNewsHttpGetIn" />
+      <wsdl:output message="tns:GetCustomNewsHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="GetCustomNewsHttpPost">
+    <wsdl:operation name="GetCustomNews">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Submit a News Topic and a List of Articles will be returned in XML from the Moreover News Service.</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomNewsHttpPostIn" />
+      <wsdl:output message="tns:GetCustomNewsHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="GetCustomNewsSoap" type="tns:GetCustomNewsSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetCustomNews">
+      <soap:operation soapAction="http://xmlme.com/WebServices/GetCustomNews" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="GetCustomNewsSoap12" type="tns:GetCustomNewsSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetCustomNews">
+      <soap12:operation soapAction="http://xmlme.com/WebServices/GetCustomNews" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="GetCustomNewsHttpGet" type="tns:GetCustomNewsHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="GetCustomNews">
+      <http:operation location="/GetCustomNews" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="GetCustomNewsHttpPost" type="tns:GetCustomNewsHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="GetCustomNews">
+      <http:operation location="/GetCustomNews" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GetCustomNews">
+    <wsdl:port name="GetCustomNewsSoap" binding="tns:GetCustomNewsSoap">
+      <soap:address location="http://www.xmlme.com/WSCustNews.asmx" />
+    </wsdl:port>
+    <wsdl:port name="GetCustomNewsSoap12" binding="tns:GetCustomNewsSoap12">
+      <soap12:address location="http://www.xmlme.com/WSCustNews.asmx" />
+    </wsdl:port>
+    <wsdl:port name="GetCustomNewsHttpGet" binding="tns:GetCustomNewsHttpGet">
+      <http:address location="http://www.xmlme.com/WSCustNews.asmx" />
+    </wsdl:port>
+    <wsdl:port name="GetCustomNewsHttpPost" binding="tns:GetCustomNewsHttpPost">
+      <http:address location="http://www.xmlme.com/WSCustNews.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

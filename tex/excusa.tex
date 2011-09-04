@@ -1,0 +1,1395 @@
+\documentclass[12pt,notitlepage]{report}
+
+\pagestyle{plain}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{a4wide}
+\usepackage{graphicx}
+\usepackage[left=4cm,bottom=3.5cm,top=3.5cm,right=4cm]{geometry}
+\usepackage[small]{caption}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{amsfonts}
+\usepackage{listings}
+
+\title{Effective XML-based communication mechanisms}
+\author{Pavol Rusnák}
+
+% \setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5 em}
+
+\begin{document}
+
+\newtheorem{definition}{Definition}
+\lstset{language=C}
+
+\pagenumbering{roman}
+
+\begin{titlepage}
+\begin{center}
+\ \\
+
+\vspace{5mm}
+
+\large
+Charles University in Prague\\
+Faculty of Mathematics and Physics\\
+
+\vspace{10mm}
+
+{\Large\bf DIPLOMA THESIS}
+
+\vspace{10mm}
+
+\includegraphics[scale=0.3]{logo_mff.eps}
+
+\vspace{10mm}
+
+{\Large Pavol Rusnák}\\
+\vspace{15mm}
+{\Large\bf Efektivní mechanismy XML komunikace}\\
+\vspace{3mm}
+Effective XML-based communication mechanisms\\
+\vspace{10mm}
+Department of Software Engineering
+\vspace{15mm}
+
+\large
+\noindent Supervisor: Doc. Ing. Jan Janeček, CSc.
+\vspace{5mm}
+
+\noindent Study Program: Computer Science, Software Systems
+\vspace{5mm}
+
+2008
+\end{center}
+
+\end{titlepage}
+
+\normalsize
+\setcounter{page}{2}
+\ \vspace{10mm}
+
+\noindent Hereby, I would like to thank my supervisor and the author of the idea of SOAP processing in embedded systems \textit{Doc. Ing. Jan Janeček, CSc.} for his time, patience, advices and comments he gave me during our cooperation.
+
+Next I would like to thank \textit{Peter Libič} for his help with benchmarking of the proposed solution and with POSIX sockets, \textit{Tomáš Dzetkulič} and \textit{Jakub Galgonek} for showing me flaws in generation of grammar for permutations and steering me towards the better solution.
+
+I would also like to thank my family, girlfriend and friends for their patience and good environment they created even though I had a very little time to spend with them during the last days.
+
+\vspace{\fill}
+\noindent I declare that I wrote the thesis by myself and listed all used sources.
+I agree with making the thesis publicly available.
+
+\bigskip
+\noindent Prague, April 18, 2008\hspace{\fill}Pavol Rusnák\\
+
+\tableofcontents
+
+\listoffigures
+
+\listoftables
+
+\newpage
+
+\noindent
+\textbf{Název práce:} Efektivní mechanismy XML komunikace\\
+\textbf{Autor:} Pavol Rusnák\\
+\textbf{Katedra:} Katedra softwarového inženýrství\\
+\textbf{Vedoucí diplomové práce:} Doc. Ing. Jan Janeček, CSc.\\
+\textbf{e-mail vedoucího:} janecek@fel.cvut.cz\\
+
+\noindent \textbf{Abstrakt:}
+XML komunikace je efektivní, protože je příjemná z programá\-torského hlediska a má obrovskou flexibilitu. Dodnes se rozšířila na rozmanité platformy kromě jedné oblasti, kterou jsou vestavěné systémy. Je to hlavně proto, že zpracovávaní textových správ je náročné na prostředky a má obvykle velkou režii. Cílem této práce je navrhnout, implementovat a otestovat novou metodu zpracovávaní SOAP zpráv pomocí formálních gramatik a automatů a tím vlastně umožnít rozšíření webových služeb také na tato malá zařízení, dokonce i na ta, která neobsahují vlastní operační systém. Naše řešení jsme pojmenovali EXCUSA, podle akronymu anglického názvu ``Effective XML Communication Using SOAP and Automata''.\\
+
+\noindent \textbf{Klíčová slova:} vestavěný systém, gramatika, webová služba, WSDL, SOAP
+
+\noindent
+\textbf{Title:} Effective XML-based communication mechanisms\\
+\textbf{Author:} Pavol Rusnák\\
+\textbf{Department:} Department of Software Engineering\\
+\textbf{Supervisor:} Doc. Ing. Jan Janeček, CSc.\\
+\textbf{Supervisor's e-mail address:} janecek@fel.cvut.cz\\
+
+\noindent \textbf{Abstract:}
+XML-based communication is effective, because it is programmer-friendly and has great flexibility. It is widely spread on variety of platforms. However, penetration of this technology has not yet reached embedded devices, because parsing of textual messages has usually large overhead and is demanding on resources. The goal of this work is to devise, implement and test a new method of parsing SOAP messages involving formal grammars and automata, thus allowing the use of web services to expand also to small devices, even on the ones without OS support. Our solution is called EXCUSA~--  acronym for ``Effective XML Communication Using SOAP and Automata''.\\
+
+\noindent \textbf{Keywords:} embedded system, formal grammar, web service, WSDL, SOAP
+
+\newpage
+
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+
+\section{Motivation}
+Forty years ago the computers were predominantly massive and expensive systems, which could be afforded only by the large institutions like the universities and companies. Advent of the microprocessors made these systems smaller and cheaper, what originated the creation of workstations or so called personal computers. Later, when local area networks were spread across the world, the concept of distributed system was born~-- an idea to connect these independent machines and to aggregate their computing power, so they appear to user as a single coherent system. Technologies that interconnect individual software components, which can be run on distinct hardware configurations, are called \textit{middleware}. Over the years several implementations were created, e.g. Sun/ONC RPC, DCE/RPC, MPI, Object Management Group's CORBA, Microsoft's DCOM or Java RMI. But today one of the most commonly used middleware architecture is so-called \textit{service-oriented architecture}~-- a modern technology based on web services, XML and SOAP.
+
+Communication based on XML messages is effective because of the programming simplicity and flexibility of the usage. That is the main reason why this method has penetrated into nearly all spheres of distributed architectures. However, there was one exception. If small (embedded) devices were part of the solution, some binary protocol was usually used instead. Binary protocol has lower requirements on bandwidth size and on computing power of device. Situation was getting better and better and now we have microcontrollers with 128--256~kilobytes of memory, clock speeds up to 32~MHz and transfer speeds up to 250~kbit/s. The biggest disadvantage of XML communication is a large overhead because of parsing text messages. This drawback can be reduced by using appropriate techniques so that embedded web services can come closer to classic ones and we could use SOAP also in small devices~-- e.g. sensors in control systems and servomechanisms or other actuators in advanced appliances.
+
+\section{Goals}
+The aim of this work will be to describe usage possibilities of XML-based RPC communication on small (embedded) devices, design and create an environment, that will allow development of effective web services on these devices~-- even on the ones without operating system. This can be achieved by using formal description of the messages by grammars.
+
+Focal point of the work will be the compiler, which was suggested in \cite{janecek}. It should take the web service definition (in WSDL file) as input and create source code for client and server. Proposed technique should be language independent. However, we will put emphasis on C language because C is the most used language in microcontroller programming. Algorithms should be as simple as possible to minimize the usage of the libraries~-- only the standard C library will be used. At the same time we want these algorithms to be effective (no string copying, all operations done in static buffers and minimum dynamic allocations of memory). The responsiveness and simple integration of the generated solution should also be a priority.
+
+An integral part of the work will be to test the proposed solution in a real environment, profile various parts of the process and to compare its performance with the performance of other existing solutions and approaches.
+
+\section{Overview of the chapters}
+
+The Chapter 2 presents various technologies and concepts that are used throughout the work. Technologies relate mostly to XML and the web service world, while concepts refer to languages, grammars, automatons, their description and formal definitions.
+
+In the Chapter 3 we explain theoretical background of the work, how the XML and grammar areas can be used together to achieve better results in middleware communication, especially optimizing parsing of the XML messages. We show off some problems that we were facing and how to solve or avoid them.
+
+In the Chapter 4 we describe our solution programmed in Java and provide detailed view on the internals of the generated code in C. We depict the generating process, especially the cooperation of the classes and the focus is also put on representation of data structures in the output code.
+
+The Chapter 5 contains results obtained from various benchmarks and tests we realized. Performance of the proposed solution was tested and compared to other, up to date existing, alternatives.
+
+The last chapter brings the conclusion, list of accomplishments, themes and ideas for the future work.
+
+% 3.  Struktura práce ve vztahu k vytyčeným cílům
+% 4.  Analýza možných implementací z různých hledisek
+\chapter{Technologies and concepts}
+
+In this chapter we present a mechanism of Remote Procedure Call, which is one of the basic methods used in distributed computing. Later we describe web services and individual technologies they utilize. Chapter ends with selected concepts from automata and grammar theory\cite{foja}.
+
+\section{Remote Procedure Call (RPC)}
+
+\textit{Remote Procedure Call} is a method that allows one code to call another that is not located
+in the same address space as calling one. Called code does not have to be on the same system, it could be for example on another system connected to first one with network. This allows to create distributed applications based on client-server architecture. The basic principle of RPC is that programmer does not have to care about code interaction and network details, he uses remote functions as it would be local ones. If object oriented programming language is used, we are talking about \textit{remote method invocation}.
+
+If program uses remote functions, so called  \textit{stub} is compiled in code, which represents code of remote procedure. When running program encounters remote procedure call, this stub passes parameters to client runtime library, which creates request message and sends it to known remote server across the network. Server handles the message (i.e. parses it and calls remote function) and creates response message, which is sent back to client runtime library, where it is again processed and result is returned to stub, which passes it back to program (see the Figure~\ref{rpc-model}). Program then continues in its flow. This applies only for \textit{synchronous} calls, where program is blocked while waiting for response. Program continues immediately when using \textit{asynchronous} calls and will pick up response later - with signal or handler.
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[width=9.5cm]{rpc-model.eps}
+ \end{center}
+ \caption{RPC model}
+ \label{rpc-model}
+\end{figure}
+
+Important difference between local and remote procedures is that remote calls can fail also because of problems caused by message transfer (most frequently network problems). This connects with another unpleasant problem: caller often does not know if the remote procedure was called or not and calling method more times with same parameters can cause trouble. (This does not happen with \textit{idempotent} procedures, i.e. procedures that can be called safely multiple times.)
+
+Messages used to represent remote calls have different formats and techniques use various protocols. This yields in often non-compatible implementations. In this work we will mention two RPC methods which use XML for transferring messages: XML-RPC (Section~\ref{xml-rpc}) and especially SOAP (Section~\ref{soap}).
+
+\section{Web Services}
+Services, similar to components, are independent building blocks of application. Contrary to classic components services have some characteristic features, that allow them to become a part of service-oriented architecture. One of such features is a complete autonomy from other services. This means that every service is responsible for itself, what typically means, that it contains only limited range of logically related specific functions. This make it possible to create stand-alone units, which are loosely connected by a compliance to a standard communication framework. This characteristic enables the programmatic logic, which is encapsulated by services, to be platform and technology independent. The most widespread and successful type of web services are XML web services. This type utilizes lots of technologies, which will be described in following sections. Their relationship is pictured in the Figure~\ref{relationship}.
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[height=9cm]{relationship.eps}
+ \end{center}
+ \caption{Relationship between the technologies used in XML Web Services}
+ \label{relationship}
+\end{figure}
+
+\section{Extensible Markup Language (XML)}
+\label{section-xml}
+XML\cite{w3c-xml} is a markup language similar to HTML, but was designed to structure, store and transport data. The main difference between XML and HTML is that HTML was created with focus on how data looks, while XML was created with focus on what data is. XML data is stored in plain text form, so it is software and hardware independent and it can be easily exchanged between incompatible systems and platforms. 
+
+XML documents form a tree structure with each node represented as \textit{element}. Element is a part of document enclosed in \textit{tags}. It can contain other elements (called children), data or both children and data. Tags are identified by their name and are enclosed between \texttt{<} and \texttt{>} characters. Contrary to HTML tags are case sensitive and must be properly nested -- they may not overlap.
+
+Example of simple XML document, which stores information about countries of the world:
+
+\begin{small}
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+  <country>
+    <name>Czech Republic</name>
+    <abbr>CZE</abbr>
+    <population>10381130</population>
+  </country>
+  <country>
+    <name>Slovak Republic</name>
+    <abbr>SVK</abbr>
+    <population>5447502</population>
+  </country>
+  <!-- TODO: add more countries later  -->
+</world>
+\end{verbatim}
+\end{small}
+
+As we can see, XML format is pretty self descriptive, because tags are not predefined, but determined by creator of XML document. XML is also extensible, which means that structure of XML can be changed without breaking the applications. For example, when someone adds information about capital cities to our XML document (by adding \texttt{capital} element as a child of \texttt{country} element), applications can still retrieve \texttt{name}, \texttt{abbr} and \texttt{population} fields.
+
+A \textit{well-formed} XML document has correct XML syntax, meaning that document has one root element, each opening tag has a corresponding closing tag and elements are properly nested.
+
+\textit{Valid} XML document is a well-formed XML document, which also conforms to some semantic rules. We will tell more about the definition of these rules in next section.
+
+\section{XML Schema Definition (XSD)}
+
+As said in previous section, we can formally describe the content of XML documents by defining some semantic rules using a schema definition language. Situation is very similar to schemas used in database systems, where they create structural model for data. In XML world, schemas provide structure validation rules, type constraints and description of relationship between elements. The most used formal descriptions are Document Type Definition (DTD)\cite{w3c-xml} and XML Schema Definition\cite{w3c-xsd0}. We will focus on the second one as XSD is the one used in definition of web services.
+
+In contrast to DTDs, XML schemas are themselves XML documents. They support wide variety of data types\cite{w3c-xsd2} and also \textit{namespaces}\cite{w3c-xsd1}. These allow author of the schema to split definition into several logical domains to which some parts of a schema can be applied. This format is very flexible and extensible. Each schema definition can contain multiple schema definitions and each schema can be dynamically extended or have its parts overridden by another schema definition.
+
+Example of XML Schema definition of the XML document shown in previous section:
+
+\begin{small}
+\begin{verbatim}
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ns="http://gk2.sk/">
+  <xs:element name="world" type="ns:world"/>
+  <xs:element name="country" type="ns:country"/>
+  <xs:complexType name="ns:world">
+    <xs:sequence>
+      <xs:element name="country" type="ns:country"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ns:country">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="abbr" type="xs:string"/>
+      <xs:element name="population" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+\end{verbatim}
+\end{small}
+
+XML schema elements can be either of \textit{simple} or \textit{complex} type, according to whether they contain attributes or child elements or not. In our example \textbf{world} is a parent element, so it has a complex type. Situation is the same with \textbf{country} element. Schema element \textit{sequence} groups children elements and tells us that they have to appear in the same order as they were specified. Similar to \textit{sequence} is \textit{all} element, but in this case children elements can appear in any order. The last grouping type is \textit{choice}. Element can contain exactly one element from the listed ones as its child, when it is used. Elements \textbf{name}, \textbf{abbr} and \textbf{population} do not contain any attributes or child elements so they have simple types -- built-in \texttt{xs:string} and \texttt{xs:integer} in particular.
+
+\section{XML-RPC}
+\label{xml-rpc}
+\textbf{XML-RPC} is a method which uses XML to encode the remote procedure calls. Hypertext Transfer Protocol is used as a transport mechanism. This approach is quite simple and defines only several data types with no inheritance. These types are listed in the following table:
+
+\begin{table}[htb]
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ll}
+\texttt{boolean} & boolean logical value (0 or 1)\\
+\texttt{int} & whole number, integer\\
+\texttt{double} & double precision floating point number\\
+\texttt{string} & string of characters\\
+\texttt{dateTime} & date and time in ISO 8601\\
+\texttt{base64} & base64-encoded binary data\\
+\texttt{array} & array of values\\
+\texttt{struct} & associative array\\
+\texttt{nil} & null value
+\end{tabular}
+\end{center}
+\caption{XML-RPC data types}
+\end{table}
+
+The fact it could work only with simple data structures caused that this technology was not adopted as a W3C standard and is today considered as a legacy technology. We list it here because it is quite easy to understand and its successor SOAP makes use of the similar ideas.
+
+Protocol recognizes two types of messages -- requests and responses. They differ in their root element. Requests have \texttt{<methodCall>} as their root element, while responses have \texttt{<methodResponse>}. Every call contains method name and a list of method parameters. These are encapsulated in \texttt{<methodName>} and \texttt{<params>} elements respectively. Response does not have \texttt{<methodName>} element and contains only \texttt{<params>} element with return value(s).
+
+Example of XML-RPC request and response:
+
+\begin{small}
+\begin{verbatim}
+<methodCall>
+  <methodName>World.getCountryCode</methodName>
+  <params>
+    <param><value><string>Slovakia</string></value></param>
+  </params>
+</methodCall>
+
+<methodResponse>
+  <params>
+    <param><value><string>SVK</string></value></param>
+  </params>
+</methodResponse>
+\end{verbatim}
+\end{small}
+
+However, XML-RPC defines one special type of method response -- Fault. This message does not have  \texttt{<params>} element. Rather it contains element \texttt{<fault>}, which holds information about an error which occurred. The body of such fault is typically composed of error code and error description. 
+
+Example of XML-RPC fault response:
+
+\begin{small}
+\begin{verbatim}
+<methodResponse>
+  <fault>
+    <value>
+      <struct>
+        <member>
+          <name>faultCode</name>
+          <value><int>4</int></value>
+        </member>
+        <member>
+          <name>faultString</name>
+          <value><string>Country code not found.</string></value>
+        </member>
+      </struct>
+    </value>
+  </fault>
+</methodResponse>
+\end{verbatim}
+\end{small}
+
+\section{Simple Object Access Protocol (SOAP)}
+\label{soap}
+In spite of the fact that this protocol was created primarily as a bridge to connect repugnant RPC-based communication architectures, SOAP protocol has become the most widespread format for use with XML web services. That's why some interprets the abbreviation SOAP as Service-Oriented Architecture Protocol and not as its original meaning Simple Object Access Protocol.
+
+SOAP allows to use both synchronous and asynchronous transfer of XML documents or remote procedure calls\cite{w3c-soap0}. Frame of the SOAP message is called the \textit{SOAP envelope}. This envelope can contain message header and has to contain message body\cite{w3c-soap1}. Let's have a look at the skeleton of the SOAP message:
+
+\begin{small}
+\begin{verbatim}
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope">
+  <env:Header>
+    ...
+  </env:Header>
+  <env:Body>
+    ...
+  </env:Body>
+</env:Envelope>
+\end{verbatim}
+\end{small}
+
+Header can include more blocks. Typical usage is to indicate implementation of predefined or application-specific SOAP extensions or to provide supplementary meta information about the SOAP message. Headers are massively used in second-generation specifications of web services and are not supported by EXCUSA.
+
+Body serves as a container for transferred data, which are usually called \textit{payload}. It can basically be arbitrary XML document, eventually a set of XML documents. SOAP does not differentiate request and response messages at the level of XML documents like it is in XML-RPC, but it secerns fault messages. These messages contain \texttt{Fault} element in \texttt{Body} construction. This is a standard fault message used when communicating nodes have incompatible SOAP versions:
+
+\begin{small}
+\begin{verbatim}
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+  <env:Body>
+    <env:Fault>
+      <env:Code><env:Value>env:VersionMismatch</env:Value></env:Code>
+      <env:Reason>
+        <env:Text xml:lang="en">SOAP Version Mismatch</env:Text>
+      </env:Reason>
+    </env:Fault>
+  </env:Body>
+</env:Envelope>
+\end{verbatim}
+\end{small}
+
+\section{Web Services Description Language\\(WSDL)}
+
+In order that web services could communicate with each other we have to define them in a consistent manner. \textbf{Web Services Description Language (WSDL)} was created for this purpose. We will split the definitions in it to two separated parts -- abstract interface and concrete implementation\cite{erl}. Both parts are stored in WSDL document's root element \texttt{definition}. Information about custom types also resides here.
+
+\subsection{Abstract definition -- interface}
+
+Abstract definition can contain several service \textit{interfaces}. Each interface is a group of logically related \textit{operations}, which represent web service functions. We can liken the interface to interfaces known from object oriented languages and operations to their methods. These operations correlate one \textit{input message} and one \textit{output message} together. Operation can also have any number of custom \textit{fault messages}. Every message consists of \textit{parts}, while each part has an associated data type and corresponds to one input or output parameter. If operation has only one output parameter, we talk usually about a return value.
+
+Example of simple interface -- calculator with methods for adding and multiplying two numbers:
+\begin{small}
+\begin{verbatim}
+<wsdl:definitions>
+  <wsdl:interface name="Calculator">
+    <wsdl:operation name="Add">
+      <wsdl:input message="TwoNumbers"/>
+      <wsdl:output message="OneNumber"/>
+      <wsdl:fault message="Error"/>
+    </wsdl:operation>
+    <wsdl:operation name="Multiply">
+      <wsdl:input message="TwoNumbers"/>
+      <wsdl:output message="OneNumber"/>
+      <wsdl:fault message="Error"/>
+    </wsdl:operation>
+  </wsdl:interface>
+  <wsdl:message name="TwoNumbers">
+    <wsdl:part name="arg1" type="xs:double"/>
+    <wsdl:part name="arg2" type="xs:double"/>
+  </wsdl:message>
+  <wsdl:message name="OneNumber">
+    <wsdl:part name="ret" type="xs:double"/>
+  </wsdl:message>
+  <wsdl:message name="Error">
+    <wsdl:part name="code" type="xs:int"/>
+  </wsdl:message>
+...
+\end{verbatim}
+\end{small}
+
+\subsection{Concrete definition -- implementation}
+
+\textit{Service} in WSDL document represents one or more \textit{endpoints} where web service can be accessed. These endpoints contain information about physical location and used protocol. \textit{Binding} associates protocol and message format to operations, which correspond to operations described in interface. Thereby binding actually defines how each individual operation can be invoked.
+
+Example of simple implementation -- definition continues from interface shown above:
+\begin{small}
+\begin{verbatim}
+...
+  <wsdl:service name="Calculator">
+    <wsdl:endpoint name="CalculatorSoap" binding="CalculatorSoap">
+      <soap:address location="http://localhost/Calculator" />
+    </wsdl:endpoint>
+  </wsdl:service>
+  <wsdl:binding name="CalculatorSoap">
+    <wsdl:operation name="Add">
+      <soap:operation soapAction="http://localhost/Calculator/Add"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+      <wsdl:fault><soap:body name="Error" use="literal"/></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Multiply">
+      <soap:operation soapAction="http://localhost/Calculator/Multiply"/>
+      <wsdl:input><soap:body use="literal"/></wsdl:input>
+      <wsdl:output><soap:body use="literal"/></wsdl:output>
+      <wsdl:fault><soap:body name="Error" use="literal"/></wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+</wsdl:definitions>
+\end{verbatim}
+\end{small}
+
+\subsection{Types}
+Web service definition contains typically also a definition of custom types and elements used in individual messages. Element \texttt{types} allows to insert XSD document into web service definition.
+
+\subsection{WSDL 1.1 vs WSDL 2.0}
+\label{wsdl-versions}
+In previous two subsections we've used WSDL terminology and syntax in version 2.0\cite{w3c-wsdl2}. Although the work on new version started already in the year 2003, it was not until June 2007, when it became W3C recommendation. Therefore this standard is still not massively used and vast majority of web services use WSDL in version 1.1\cite{w3c-wsdl}. Main and the most apparent differences are:
+\begin{itemize}
+ \item \texttt{interface} element was called \texttt{portType} before
+ \item \texttt{endpoint} element was called \texttt{port} before
+ \item WSDL 2.0 allows modularization by including and importing of service descriptions
+ \item inheritance of interfaces is supported by \texttt{extends} attribute in the interface element
+ \item message constructs were obsoleted in favor of elements in types section (each message can be replaced by element of sequence complex type)
+\end{itemize}
+
+\section{Universal Description, Discovery and Integration (UDDI)}
+
+\textbf{Universal Description, Discovery and Integration} (\textbf{UDDI}) is a platform independent directory for storing and retrieving information about web services and its interfaces described by WSDL. It is accessed using SOAP. Our work does not utilize this technology directly.
+
+\section{Generative grammar}
+Alphabet is any finite set $\Sigma$ of members called \textit{symbols}. String over the alphabet $\Sigma$ is arbitrary sequence of the symbols of this alphabet. For example string \textit{aabcccb} is a string over the alphabet $\left\lbrace a, b, c \right\rbrace$. Grammar is an exact description of the language. In other words, it describes, which sequences of symbols -- strings -- are valid ones -- words.
+We can generate all words using grammar and what is more important grammar can also be used to create \textit{recognizer}, which decides whether the word is \textit{grammatical} (belongs to language) or not. Formal descriptions of these recognizers are called \textit{automata}. In our work we will focus on special type of generative grammars. They contain only one nonterminal on left side of each rewriting rule and are called \textit{context-free} grammars.
+
+\begin{definition}
+Generative context-free grammar is quad-tuple \[G = (\mathbb{N}, \Sigma, S, \mathbb{R})\] where:
+
+\begin{itemize}
+ \item $\mathbb{N}$ is a finite nonempty set of \textit{nonterminal symbols} or \textit{nonterminals}
+ \item $\Sigma$ is a finite nonempty set of \textit{terminal symbols} or \textit{terminals} (disjoint from $\mathbb{N}$)
+ \item $S \in \mathbb{N}$ is the \textit{start symbol} also called \textit{grammar root}
+ \item $\mathbb{R}$ is a finite \textit{set of production} or \textit{rewriting rules}, \\
+       $\mathbb{R}$ is a relation $\mathbb{R}$: $\mathbb{N} \rightarrow (\mathbb{N} \cup \Sigma)^{*}$
+\end{itemize}
+\end{definition}
+
+Language of a formal grammar, denoted $L(G)$, is a set of all words over alphabet $\Sigma$, which can be generated from the start symbol $S$ and applying the production rules from $\mathbb{R}$ until all nonterminal symbols are replaced with terminal symbols. Language generated by context-free grammar is context-free and is accepted by Pushdown automaton (see the Section~\ref{dpda}).
+
+\section{Finite state automaton}
+A \textbf{finite state automaton} is an abstract model of behavior, which consists of finite count of states and transitions between them. It contains control unit, a reading head and a tape, on which the input string is written. At the beginning of computation the reading head is located at the beginning of the tape. In each step automaton reads one symbol from the tape, changes its state and moves the head one field forward. States changes according to the transition function, which means that the change depends on current state and last read symbol. Computation ends when the automaton is ``blocked'' or the whole input string is read. The string is \textit{accepted} by automaton when it is read to the end \textbf{and} resulting state is one of the accepting states.
+
+\begin{definition}
+Finite state automaton is a 5-tuple \[F = (\mathbb{Q}, \Sigma, \delta, q_{0}, \mathbb{A})\] where:
+
+\begin{itemize}
+ \item $\mathbb{Q}$ is a finite set of states
+ \item $\Sigma$ is a finite set of input symbols (input alphabet)
+ \item $\delta$ is a transition function, $\delta: \mathbb{Q} \times \Sigma \rightarrow \mathbb{Q}$
+ \item $q_{0} \in \mathbb{Q}$ is the start state
+ \item $\mathbb{A} \subseteq \mathbb{Q}$ is a set of accepting states
+\end{itemize}
+\end{definition}
+
+\section{Deterministic pushdown automaton}
+\label{dpda}
+
+\textbf{Deterministic pushdown automaton} is a state machine derived from deterministic finite automaton by adding auxiliary memory called \textit{stack}. In each step automaton can read one symbol from top of the stack and can push down arbitrary count of symbols (even the one that was just read). Transition depends on the current state, read symbol from the input tape and value from the top of the stack. Automaton stops when the final state is reached (we talk about acceptance by \textit{final state}) or there are no symbols on stack (we talk about acceptance by \textit{empty stack}). These two acceptance criteria are not equivalent in deterministic pushdown automaton.
+
+\begin{definition}
+Deterministic pushdown automaton is a 7-tuple \[M = (\mathbb{Q}, \Sigma, \Gamma, \delta, q_{0}, Z_{0}, \mathbb{A})\] where:
+
+\begin{itemize}
+ \item $\mathbb{Q}$ is a finite set of states
+ \item $\Sigma$ is a finite set of input symbols (input alphabet)
+ \item $\Gamma$ is a finite set of stack symbols (stack alphabet)
+ \item $\delta$ is a transition function,
+   $\delta: \mathbb{Q} \times (\Sigma \cup \lbrace\lambda\rbrace) \times \Gamma \rightarrow \mathbb{Q} \times \Gamma^{*}$
+ \item $q_{0} \in \mathbb{Q}$ is the start state
+ \item $Z_{0} \in \Gamma$ is the start stack symbol
+ \item $\mathbb{A} \subseteq \mathbb{Q}$ is a set of accepting states
+\end{itemize}
+\end{definition}
+
+% 5.  Návrh implementace s diskusí alternativ
+\chapter{Theory}
+In our work we tried to optimize XML communication using knowledge in formal language theory. To understand how the optimization process works, we introduce one particular type of context-free grammars and later we will show how we deal with concrete fragments of XML schemas.
+
+\section{XML grammar}
+\label{xml-grammar}
+
+All XML documents consist of tags and text located between these tags. Tags can be opening or closing and each opening tag has its corresponding closing tag and vice versa. Empty tags can be considered as opening tag followed immediately by closing tag, so we can assume that document contains no empty tags.
+Let's denote the set of opening tags as~$\mathbb{T}$ and the set of corresponding closing tags as~$\overline{\mathbb{T}}$. Since we are interested only in syntactic structure, we will omit attributes of the tags. Let's mark set of all valid values for type \textit{int} as $\mathbb{V}_{int}$, for type \textit{string} $\mathbb{V}_{string}$ and so on. Set $\mathbb{V}$ is union of all these sets. XML document is then word over the alphabet $\Sigma = \mathbb{T} \cup \overline{\mathbb{T}} \cup \mathbb{V}$ and we can formally define grammar describing XML documents:
+
+\begin{definition}
+XML-grammar is quad-tuple \[G = (\mathbb{N}, \Sigma, S, \mathbb{R})\] where:
+
+\begin{itemize}
+ \item $\mathbb{N}$ is a finite nonempty \textit{set of nonterminal symbols}
+ \item $\Sigma = \mathbb{T} \cup \overline{\mathbb{T}} \cup \mathbb{V}$ is a finite nonempty \textit{set of terminal symbols} (disjoint from $\mathbb{N}$)
+ \item $S \in \mathbb{N}$ is the \textit{start symbol}
+ \item $\mathbb{R}$ is a finite set of \textit{production} or \textit{rewrite rules}, each in one of these forms:
+   \begin{enumerate}
+    \item $n \rightarrow \mathbb{N}^{*}$
+    \item $n \rightarrow t m \overline{t}$
+    \item $n \rightarrow v$
+   \end{enumerate}
+   where $n, m \in \mathbb{N}$, $t \in \mathbb{T}$, $\overline{t} \in \overline{\mathbb{T}}$ and $v \in \mathbb{V}$
+\end{itemize}
+\end{definition}
+
+This definition of XML grammars is more simple than the one proposed by Berstel and Boasson in \cite{berstel-boasson}. Their formalization is more general, but we wanted to achieve smaller complexity of the rewriting rules by having exactly one nonterminal on their left sides. These grammars are called \textit{tree grammars} and are subset of \textit{deterministic context-free grammars}, therefore \textit{deterministic push-down automaton} recognizing them exists. An \textit{XML language} is a language generated by some XML grammar.
+
+\section{Converting XML schema to XML grammar}
+\label{convert-xml-grammar}
+
+XML documents are precisely described by XML schema. This suggests the idea to use XML schema to generate XML grammar, which will recognize given XML documents. We will show the technique in a couple of simple examples. Because contents of sets describing tags ($\mathbb{T}$ and $\overline{\mathbb{T}}$) are pretty straightforward ($\mathbb{T}$ contains all used $t_{tag}$ symbols and $\overline{\mathbb{T}}$ contains all used $\overline{t_{tag}}$ symbols), we will list only rewrite rules (set $\mathbb{R}$) and mark nonterminals symbols as letters of Latin alphabet while $A$ will be the start symbol. Symbol $v_{type} \in \mathbb{V}_{type}$ represents value of type \textit{type}. Rules relevant to particular case are marked with full disc.
+
+\subsection{Simple type}
+
+Creating grammar for one element containing simple type is indeed simple. One rule is used to rewrite the start symbol to opening tag, another nonterminal symbol and corresponding closing tag. Another rule to change second nonterminal to particular value type.
+
+\begin{center}
+\setlength{\tabcolsep}{0.5cm}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+XML example & XML grammar rewrite rules \\ \hline
+\texttt{<size>3264</size>} & $\bullet~A \rightarrow t_{size}~B~\overline{t_{size}}$ \\
+ & $\bullet~B \rightarrow v_{int}$ \\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Optional element}
+
+When element has attributes \textit{minOccurs} and \textit{maxOccurs} set to $0$ and $1$ respectively, we are talking about \textit{optional element}. This element can but does not have to appear in document. We achieve this behavior by adding two rewriting rules into grammar. One is rewriting one nonterminal into another and the second one is changing the same nonterminal into empty symbol ($\varepsilon$).
+
+\begin{center}
+\setlength{\tabcolsep}{0.5cm}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+XML example & XML grammar rewrite rules \\ \hline
+\texttt{<error>} & $\circ~A \rightarrow t_{error}~B~\overline{t_{error}}$ \\
+\texttt{~~<code>3</code>} & $\bullet~B \rightarrow C$ \\
+\texttt{</error>} & $\bullet~B \rightarrow \varepsilon$ \\
+\multicolumn{1}{|c|}{or} & $\circ~C \rightarrow t_{code}~B~\overline{t_{code}}$ \\
+\texttt{<error></error>} & $\circ~D \rightarrow v_{int}$ \\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Repeating element}
+\label{repeating-element}
+
+Element can also repeat itself. Bounds are set with \textit{minOccurs} and \textit{maxOccurs} attributes of the element. When both these values are concrete numbers (let's mark them as $m$ and $n$), we generate $n-m$ rules with the same nonterminal on their left side and their right side containing another nonterminal repeated $m, m+1, ..., n-1, n$ times. See the example where $m=1$ and $n=3$ (thus element \texttt{array} can contain one, two or three \texttt{val} elements):
+
+\begin{center}
+\setlength{\tabcolsep}{0.5cm}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+XML example & XML grammar rewrite rules \\ \hline
+& $\circ~A \rightarrow  t_{array}~B~\overline{t_{array}}$ \\
+\texttt{<array>} & $\bullet~B \rightarrow C~C~C$ \\
+\texttt{~~<val>1257</val>} & $\bullet~B \rightarrow C~C$ \\
+\texttt{~~<val>358</val>} & $\bullet~B \rightarrow C $ \\
+\texttt{</array>} & $\circ~C \rightarrow t_{val}~D~\overline{t_{val}}$ \\
+& $\circ~D \rightarrow v_{int}$ \\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Infinitely repeating element}
+
+Element can repeat itself infinitely. This is the case when \textit{maxOccurs} attribute is set to \textit{unbounded} value. We solve this case by adding two rewrite rules with the same nonterminal on their left sides. One rewrites nonterminal to another nonterminal followed by the same nonterminal as on the left side (thus causing recursion), the second one rewrites nonterminal to empty symbol ($\varepsilon$)~-- stopping recursion.
+
+\begin{center}
+\setlength{\tabcolsep}{0.5cm}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+XML example & XML grammar rewrite rules \\ \hline
+\texttt{<array>} & $\circ~A \rightarrow  t_{array}~B~\overline{t_{array}}$ \\
+\texttt{~~<val>974</val>} & $\bullet~B \rightarrow C~B$ \\
+\texttt{~~<val>1465</val>} & $\bullet~B \rightarrow \varepsilon$ \\
+\texttt{~~...} & $\circ~C \rightarrow t_{val}~D~\overline{t_{val}}$ \\
+\texttt{</array>} & $\circ~D \rightarrow v_{int}$ \\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Complex content: Choice}
+
+Choice is done by adding one rewrite rule for each possibility. These rewrite rules contain the same nonterminal on their left side and exactly one nonterminal, equal to the start symbol of the element they refer to, on their right side.
+
+\begin{center}
+\setlength{\tabcolsep}{0.5cm}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+XML example & XML grammar rewrite rules \\ \hline
+\texttt{<value>} & $\circ~A \rightarrow t_{value}~B~\overline{t_{value}}$ \\
+\texttt{~~<int>3</int>} & $\bullet~B \rightarrow C$ \\
+\texttt{</value>} & $\bullet~B \rightarrow E$ \\
+\multicolumn{1}{|c|}{or} & $\circ~C \rightarrow t_{int}~D~\overline{t_{int}}$ \\
+\texttt{<value>} & $\circ~D \rightarrow v_{int}$ \\
+\texttt{~~<float>3.14159</float>} & $\circ~E \rightarrow t_{float}~F~\overline{t_{float}}$ \\
+\texttt{</value>} & $\circ~F \rightarrow v_{float}$ \\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Complex content: Sequence}
+
+Contrary to choice, all listed elements have to appear in sequence. This means we manage this case by adding only one rewriting rule containing all the start symbols on its right side.
+
+\begin{center}
+\setlength{\tabcolsep}{0.5cm}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+XML example & XML grammar rewrite rules \\ \hline
+ & $\circ~A \rightarrow t_{address}~B~\overline{t_{address}}$ \\
+\texttt{<address>} & $\bullet~B \rightarrow C~E~G$ \\
+\texttt{~~<street>Evergreen Terrace</city>} & $\circ~C \rightarrow t_{street}~D~\overline{t_{street}}$ \\
+\texttt{~~<number>742</number>} & $\circ~D \rightarrow v_{string}$ \\
+\texttt{~~<city>Springfield</city>} & $\circ~E \rightarrow t_{number}~F~\overline{t_{number}}$ \\
+\texttt{</address>} & $\circ~F \rightarrow v_{int}$ \\
+ & $\circ~G \rightarrow t_{city}~H~\overline{t_{city}}$ \\
+ & $\circ~H \rightarrow v_{string}$ \\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Complex content: All}
+All is similar to sequence, but listed elements can appear in any order. Unfortunately we have to calculate with all possibilities of ordering so we have to create all permutations to solve this problem. The most straightforward procedure is to generate rewriting rule for each permutation. This can be seen in following example. Only one permutation is shown in the XML document, but document can contain any other permutation of the inner tags.
+
+\begin{center}
+\setlength{\tabcolsep}{0.5cm}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+XML example & XML grammar rewrite rules\\ \hline
+& $\circ~A \rightarrow t_{address}~B~\overline{t_{address}}$ \\
+& $\bullet~B \rightarrow C~E~G$ \\
+& $\bullet~B \rightarrow C~G~E$ \\
+& $\bullet~B \rightarrow E~C~G$ \\
+\texttt{<address>} & $\bullet~B \rightarrow E~G~C$ \\
+\texttt{~~<city>Springfield</city>} & $\bullet~B \rightarrow G~C~E$ \\
+\texttt{~~<number>742</number>} & $\bullet~B \rightarrow G~E~C$ \\
+\texttt{~~<street>Evergreen Terrace</city>} & $\circ~C \rightarrow t_{street}~D~\overline{t_{street}}$ \\
+\texttt{</address>} & $\circ~D \rightarrow v_{string}$ \\
+& $\circ~E \rightarrow t_{number}~F~\overline{t_{number}}$ \\
+& $\circ~F \rightarrow v_{int}$ \\
+& $\circ~G \rightarrow t_{city}~H~\overline{t_{city}}$ \\
+& $\circ~H \rightarrow v_{string}$ \\ \hline
+\end{tabular}
+\end{center}
+
+This technique brings obvious problem. When we have $n$ inner elements, the number of rewriting rules increases by $n!$ (for 7 elements we have more than 5000 rules!). This count can be reduced by following method. Suppose we want to rewrite nonterminal $S$ to every permutation of set of nonterminals $\left\lbrace A, B, C, D\right\rbrace$. We will introduce new nonterminals $S_{1}~...~S_{6}$. And add these rules:
+
+\begin{center}
+\begin{tabular}{lll}
+$S \rightarrow S_{1}~S_{6}$ & $S_{1} \rightarrow A~B$ & $S_{4} \rightarrow B~C$ \\ 
+$S \rightarrow S_{2}~S_{5}$ & $S_{1} \rightarrow B~A$ & $S_{4} \rightarrow C~B$ \\ 
+$S \rightarrow S_{3}~S_{4}$ & $S_{2} \rightarrow A~C$ & $S_{5} \rightarrow B~D$ \\ 
+$S \rightarrow S_{4}~S_{3}$ & $S_{2} \rightarrow C~A$ & $S_{5} \rightarrow D~B$ \\ 
+$S \rightarrow S_{5}~S_{2}$ & $S_{3} \rightarrow A~D$ & $S_{6} \rightarrow C~D$ \\ 
+$S \rightarrow S_{6}~S_{1}$ & $S_{3} \rightarrow D~A$ & $S_{6} \rightarrow D~C$
+\end{tabular}
+\end{center}
+
+How did we construct these rules? We created rules $S \rightarrow S_{i}~S_{j}$ for each possible break-up of sets into two halves. How many of these distributions we have? Since we are picking half of the elements from $n$ the count is: \[{{n}\choose{\lceil n/2 \rceil}} = {{n!}\over{\lceil n/2 \rceil!\lfloor n/2 \rfloor!}}\] If the set size is greater than 3, we repeat the procedure. If it is less than or equal to three we generate all permutations. For $n$ nonterminals we can express the count of generated rules by this function: \[f(n) = {{n}\choose{\lceil n/2 \rceil}} + {{n}\choose{\lceil n/2 \rceil}} * f(\lceil n/2 \rceil) = {{n}\choose{\lceil n/2 \rceil}} * (1 + f(\lceil n/2 \rceil))\] where $f(1) = 1$, $f(2) = 2$ and $f(3) = 6$ (since we generate all permutations when the set has less than 4 members). This method gives us pretty better results than straightforward generating of permutations (see following table).
+
+\begin{center}
+\setlength{\tabcolsep}{0.5cm}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|}
+\hline
+$n$ & $n!$ & $f(n)$ \\ \hline
+$1$ & 1 & 1 \\ \hline
+$2$ & 2 & 2 \\ \hline
+$3$ & 6 & 6 \\ \hline
+$4$ & 24 & 18 \\ \hline
+$5$ & 120 & 70 \\ \hline
+$6$ & 720 & 140 \\ \hline
+$7$ & 5040 & 665 \\ \hline
+$8$ & 40320 & 1330 \\ \hline
+$9$ & 362880 & 8946 \\ \hline
+$10$ & 3628800 & 17892 \\ \hline
+\end{tabular}
+\end{center}
+
+Despite this optimization the count of rewriting rules increases far too rapidly and we should avoid this type of complex content. This is usually not a problem, because in remote procedure calls we transfer messages with specified content, which correspond to structures defined in procedural languages and have thus fixed order of inner data. Therefore ``sequence'' complex type is a good replacement when designing the XML schema.
+
+\section{Automaton for XML grammar}
+\label{xml-automaton}
+How do we construct automaton which recognizes XML documents when we have already constructed XML grammar? We start with creating finite automata for each opening tag and each closing tag~-- automata $F_{tag}$ and $\overline{F_{tag}}$ respectively. These automata will be very similar to each other because they differ only in tag name and whether they require a slash before tag or not. We will need also finite automaton for each supported value type~-- $F_{type}$. We now have to connect these automata so they can interact together. If grammar contained only rewrite rules with unique nonterminals on their left sides, another finite automaton would suffice. Rewrite rules would form some kind of static tree and the parsing procedure would be always the same independently of input. When we have more rules with the same nonterminal on their left side, we have to try more options at some point and often even revert last steps depending on input. Tracking back indicates that finite automata is not enough and we will need stack for storing previous steps. By adding stack to finite automaton we will get stronger apparatus - deterministic pushdown automaton (see the Section~\ref{dpda}). If we limited the nesting level to some particular value we could have used finite automaton instead of stack automaton, but we would have to rebuild it when we wanted to alter schema and add for example one element. When we use stack automaton we have advantage that it suffices only to change the corresponding rewriting rule.
+
+We will demonstrate the function of such automaton on a simple example from the Subsection~\ref{repeating-element}. We have 5 finite automata. $F_{array}$ accepts opening \texttt{<array>} tag, $F_{val}$ accepts opening \texttt{<val>} tag, $\overline{F_{array}}$ and $\overline{F_{val}}$ accept corresponding closing tags and finally automaton $F_{int}$ accepts all legal integer values. These automata are used by deterministic pushdown automaton, which calls them and if they accept the input word it continues and if they reject it it pops out the value of the stack and tries another rule. 
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[height=3.2cm]{automaton1.eps} 
+  \includegraphics[height=3.2cm]{automaton2.eps} \\ \vspace{0.75cm}
+  \includegraphics[height=3.2cm]{automaton3.eps}
+  \includegraphics[height=3.2cm]{automaton4.eps}
+ \end{center}
+ \caption{Automaton function}
+ \label{automaton-function}
+\end{figure}
+
+Automaton takes the first rewrite rule and puts its left side nonterminal on the stack. Then it starts processing the right side. The first symbol is opening tag \texttt{array}, so finite automaton for it is called. It accepts the word, so we continue by pushing B on stack and processing this rule. Right side contains three Cs so we push first one onto stack and start processing it. We call automaton and it accepts tag \texttt{val}. Then D is pushed onto stack and processed by calling automaton for accepting integers. This will run smoothly and as we are at the end of D rule, we pop it out of stack and return to C. We call automaton for accepting closing \texttt{val} tag, pop C out of stack and return to B, which has 2 more Cs to test. Second one passes in the same way as the first one, but problem occurs with the third one. Automaton for opening tag \texttt{val} fails, so we have to pop all three Cs out of stack (B rule failed, so we have to clean it) and now we can test second B rule with only 2 Cs on its right side. This runs clearly to the end, so we can also pop out also B and after closing tag array we can also pop out A. At the end the stack is empty so we have successfully parsed our XML. If we run out of the rewriting rules during parsing (no more for match) or we ended with non empty stack, XML is not processed.
+
+% 6.  Popis detailů nestandardních řešení a postupů implementace
+\chapter{Implementation}
+\label{implementation}
+
+The program is actually a command-line utility, which input is the only WSDL file with web service definition. This file could be hand crafted by user, if the user has sufficient knowledge, eventually retrieved from another running web server or some UDDI source. The most frequently used option is to generate WSDL file from sources in some higher object oriented programming language. There is \textit{Java2WSDL} tool from Apache Axis project for Java and similar process also exists for C\# language.
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[height=7cm]{usage.eps}
+ \end{center}
+ \caption{Usage schema}
+ \label{usage-schema}
+\end{figure}
+
+Program creates directory same as the name of the webservice and puts generated source files there. From these sources one can build independent server and library with header file for client. The only thing user has to do (apart from creating or retrieving WSDL file) is to move bodies of methods from client sources to server sources. Linking the library causes that these methods will be accessible in client and every call to them will lead to creation of request and communication with the server.
+
+At the beginning we tried to implement the application in C++ language, but this later showed as a suboptimal solution, because there are not so many good libraries that simplify work with WSDL definitions and XML schemas and this inhibited the whole process. It is important that resulting generated code is not so demanding on resources, not the generator itself, so we switched development to Java. This made programming a lot easier, because there are many web service oriented frameworks for Java we could pick from. One of the best-known is the Apache Axis\cite{apache-axis} project. We reused two packages from it~-- wsdl4j and XMLschema. This decision brought also another advantage: result code can be run on variety of operating systems supporting Java without any recompiling (for example Microsoft Windows, Apple Mac OS X, GNU/Linux, Solaris and others).
+
+\section{Program structure}
+\label{program-structure}
+
+The program could be divided in four logically separated components. These correspond to the packages used in Java programming language:
+
+\begin{itemize}
+ \item\texttt{wsdl} \\ objects for services, endpoints, operations, messages and other entities extracted from provided WSDL file
+ \item\texttt{schema} \\ objects for types and elements from XML schema definition found in WSDL file
+ \item\texttt{grammar} \\ objects for grammars, rewrite rules and grammar symbols (terminals and nonterminals)
+ \item\texttt{code} \\ objects for generating data structures and code
+\end{itemize}
+
+\subsection{Package wsdl}
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[scale=0.27]{uml-wsdl.eps}
+ \end{center}
+ \caption{UML diagram of package wsdl}
+ \label{uml-wsdl}
+\end{figure}
+
+Package \textbf{wsdl} contains classes which are related to web services and their definition. They provide methods to work with WSDL files. Wsdl4j package from Apache Axis project is used here.
+
+The main class is \textbf{Definition}. It loads WSDL file, which can be either stored locally or retrieved from remote location. All entities such as services, operations and messages are converted from wsdl4j representation into our own. This is done because original representation was far too complex for our purposes. All services are stored in hashmaps, which are indexed with their name. 
+
+Class \textbf{Service} represents web service. Every service has its own unique name and could contain documentation, which is used as a comment in output code. These two attributes are present also in the next three classes. Service can define various access methods~-- these are called endpoints, which are stored in class \textbf{Endpoint}. Important attribute of endpoints is their type, which is enumerated in enum \textbf{EndpointType}. Valid endpoint types are: \textit{HTTP\_GET}, \textit{HTTP\_POST}, \textit{SOAP} and \textit{SOAP12}. Each service can have at most one endpoint of one type, what means that service can define at most four endpoints.
+
+Every endpoint can have different set of operations, but in practice they are usually the same. Operations are stored in class \textbf{Operation}. HTTP operations (\textit{HTTP\_GET} and \textit{HTTP\_POST}) have attribute location and SOAP operations (\textit{SOAP} and \textit{SOAP12}) have attribute action. These have fundamentally the same meaning: they are sent to server in header, so server can identify to which method does the request belong to without parsing the message first. This also allows using one message for more methods, although this is not widely used to avoid confusion. Every operation has exactly one input message, exactly one output message and arbitrary number of fault messages.
+
+All three types of messages are represented by class \textbf{Message} distinguishable by attribute type. These are enumerated in enum \textbf{MessageType} and valid values are: \textit{Input}, \textit{Output} and \textit{Fault}. Every message contains at least one message part (class \textbf{MessagePart})~-- containing reference to exactly one element or exactly one type (see next section).
+
+\subsection{Package schema}
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[scale=0.27]{uml-schema.eps}
+ \end{center}
+ \caption{UML diagram of package schema}
+ \label{uml-schema}
+\end{figure}
+
+Objects in package \textbf{schema} hold information about types contained in XML schema defined in WSDL file. Class \textbf{Element} represents XML elements. Each element has its name, which is the same value as the identifier used in tags between opening and closing bracket. Element references exactly one simple type or exactly one complex type. If the simple type is used, particular value of this type can appear between the opening and closing tag and nothing else. In the case of complex type, element contains another elements in order specified by this complex type (see below). Very important attributes are \textit{minOccurs} and \textit{maxOccurs}. These denote whether the element is optional (\textit{minOccurs} is zero) or can repeat in XML document (\textit{maxOccurs} is larger than one).
+
+Simple types are stored in classes based on abstract class \textbf{SimpleType}. They are: \textit{SimpleTypeBasic}, \textit{SimpleTypeList}, \textit{SimpleTypeRestriction} and \textit{SimpleTypeUnion}. Class \textbf{SimpleTypeBasic} represents some of the basic types defined in XML schema. These types are enumerated in enum \textbf{Type}, which is used also in other packages. Valid values are: \textit{String}, \textit{Boolean}, \textit{Float}, \textit{Double}, \textit{Integer}, \textit{Long}, \textit{Int}, \textit{Short}, \textit{Byte}, \textit{UnsignedLong}, \textit{UnsignedInt}, \textit{UnsignedShort}, \textit{UnsignedByte}, \textit{Base64Binary} and \textit{HexBinary}. The last two are used to store arbitrary binary data, for example images. For information about mapping from XML to C types see the Table \ref{type-mapping} in the Subsection \ref{convertheader}.
+
+Complex types are used for deriving more advanced types by grouping elements and are represented by class \textbf{ComplexType}. Each complex type contains list of elements and type of grouping enumerated in enum \textbf{ComplexTypeGroupType}, which lists three valid values: \textit{Choice}, \textit{Sequence} and \textit{All}. \textit{Choice} complex type contains exactly one element of listed ones, \textit{Sequence} complex type contains all listed elements in the same order as they are listed and finally \textit{All} complex type contains all listed elements in any random order.
+
+\subsection{Package grammar}
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[scale=0.27]{uml-grammar.eps}
+ \end{center}
+ \caption{UML diagram of package grammar}
+ \label{uml-grammar}
+\end{figure}
+
+Package \textbf{grammar} and its objects are used when generating grammars of the messages. Main class is the \textbf{Grammar} class. It contains one nonterminal (start symbol) and a list of rewrite rules, which are represented by object \textbf{RewriteRule}. This class contains one nonterminal (left side of the rule) and the list of symbols (right side of the rule). Each rewrite rule has its type, which are enumerated in enum \textbf{RewriteRuleType} and correspond to the types we introduced in the Section \ref{xml-grammar}~-- in exact order: \textit{NonTerminals}, \textit{Tag} and \textit{Value}.
+
+Abstract class \textbf{Symbol} is a base for all symbols used in rewrite rules. One implementation of it is class \textbf{NonTerminal} representing grammar nonterminals. These have only one attribute~-- unique identifier to distinguish them. Its logical counterpart is abstract class \textbf{Terminal}, which has two descendants: class \textbf{Value} and abstract class \textbf{Tag}. \textbf{Value} represents simple type values contained in elements. Classes \textbf{StartTag} and \textbf{EndTag} have class \textbf{Tag} as their common ancestor, and represent opening and closing tags of the element.
+
+Special role in this package has class \textbf{GrammarCreator}. Messages are XML documents and their schema is available in web service definition, so procedure described in the Section \ref{xml-grammar} can be used to generate grammars for each of the messages.
+
+\subsection{Package code}
+\label{package-code}
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[scale=0.27]{uml-code.eps}
+ \end{center}
+ \caption{UML diagram of package code}
+ \label{uml-code}
+\end{figure}
+
+Last package in EXCUSA project is package \textbf{code}. This contains classes for generating code and output files. Each message and element containing complex type is represented with class \textbf{Structure}. Its name correspond to message or complex type name. Class \textbf{Structure} contains list of \textbf{StructureField} classes. When the structure is message, fields stand for message parts. If the message part is simple type, it is used in structure directly, if not, pointer to structure representing the element is used. Similar situation is with structures of the complex types, with the difference that fields correspond to elements listed in complex type and these fields can be optional or list (message parts can not, they always appear in the count of one).
+
+Field is optional when \textit{minOccurs} attribute of the element is zero. In this case it can contain NULL value (and we have to check it for example when freeing structure). When the field is list (\textit{maxOccurs} of the element is larger than one), it contains pointer to list of structures and one special field named \texttt{<variable>\_count}. This stores the number of items previously described pointer is pointing to (this number is important for user when iterating through the elements and also when freeing the structure).
+
+Structure field can also reference to simple type (when message part or member of complex type is of simple type) and in this case it holds type information (class \textbf{Type} from \textbf{schema} package). Each structure can generate code of four functions. Two for serializing to XML and deserializing from XML (functions \texttt{construct<Structure>} and \texttt{parse<Structure>}) and two for allocating and freeing memory needed by structure (functions \texttt{alloc<Structure>} and \texttt{free<Structure>}). Examples of structure contents and functions to manipulate them are listed in the Subsection \ref{serviceh-commonc} below.
+
+Class \textbf{GrammarStructGenerator} generates representation of grammars in C language (described later in the Subsection~\ref{sub-grammar}) and finally class \textbf{CodeGenerator} glues all generators together and creates output files filled with the code provided by them.
+
+\section{Generated files}
+
+The application generates various source files. These are built using \texttt{make} utility, which uses provided Makefile and creates some intermediate files. Finally, after the build is done, we end up with client library and server binary. We can divide the files into these categories:
+
+\begin{itemize}
+\item input files (generated directly by EXCUSA tool) \\
+\texttt{Makefile}, \texttt{<service>.h}, \texttt{<service>.wsdl} \\
+\texttt{convert.h}, \texttt{grammar.h}, \texttt{server\_methods.h} \\ 
+\texttt{client.c}, \texttt{common.c}, \texttt{convert.c}, \texttt{grammar.c}, \texttt{server.c}
+\item intermediate files (created by \texttt{make} during build) \\
+ \texttt{wsdl.c}, object files (\texttt{*.o})
+\item output (final redistributable) files \\
+ client (\texttt{<service>.h}, \texttt{libclient.a}) and server (\texttt{server})
+\end{itemize}
+
+In consequent subsections we will describe each of the file closely and show their interesting and nontrivial passages.
+
+\subsection{\texttt{Makefile}}
+
+Makefile contains build instructions how to build both client library and server binary. It can be used with GNU make or other compatible utility.
+
+\subsection{\texttt{<service>.wsdl}}
+
+WSDL definition file functionally identical to the WSDL file used to generate the service.
+
+\subsection{\texttt{<service>.h} and \texttt{common.c}}
+\label{serviceh-commonc}
+These two files are the core of the EXCUSA engine. Header file contains definition of structures which are used to represent all messages and elements containing complex types. They are followed by function prototypes for allocating, freeing, constructing and parsing these structures. File ends with declarations of remote methods from WSDL file, so they can be included by both client and server code.
+
+File \texttt{common.c} contains mentioned functions to work with structures and automaton parser code. We will show by example how we generate structures and code from XML schema. Suppose we want to have one element with complex content. It contains number identifier, optional string description and unbounded array of points represented by another complex type.  XML schema definition could be similar to this one:
+
+\begin{small}
+\begin{verbatim}
+<s:schema targetNamespace="http://localhost/">
+  <s:complexType name="Point">
+    <s:sequence>
+      <s:element name="posx" type="s:double"/>
+      <s:element name="posy" type="s:double"/>
+    </s:sequence>
+  </s:complexType>
+  <s:element name="Test">
+    <s:complexType>
+      <s:sequence>
+        <s:element name="id" type="s:int"/>
+        <s:element name="desc" type="s:string" minOccurs="0"
+                   maxOccurs="1"/>
+        <s:element name="point" type="tns:Point" minOccurs="0"
+                   maxOccurs="unbounded"/>
+      </s:sequence>
+    </s:complexType>
+    </s:element>
+</s:schema>
+\end{verbatim}
+\end{small}
+
+Generators mentioned in the Subsection~\ref{package-code} will generate following code for structures for previous schema. Types \textit{Double}, \textit{Int} and \textit{String} are aliases for normal C types. They are created using \texttt{typedef} in \texttt{convert.h} header file~-- see following subsection.
+
+\begin{small}
+\begin{lstlisting}
+struct Point {
+    Double posx;
+    Double posy;
+};
+
+struct Test {
+    Int id;
+    String desc; /* optional */
+    struct Point **point; /* min: 0, max: unbounded */
+    int pts_count;
+};
+\end{lstlisting}
+\end{small}
+
+Code for allocating memory for structures are created using macros because of their simplicity and effectivity. Each structure has one macro for allocating single instance and list of instances.
+\begin{small}
+\begin{lstlisting}
+#define allocTest() \
+          ((struct Test *)malloc(sizeof(struct Test)))
+#define allocTestList(N) \
+          ((struct Test **)malloc((N)*sizeof(struct Test*)))
+#define allocPoint() \
+          ((struct Point *)malloc(sizeof(struct Point)))
+#define allocPointList(N) \
+          ((struct Point **)malloc((N)*sizeof(struct Point*)))
+\end{lstlisting}
+\end{small}
+
+Freeing structures is done with functions, because it is slightly more complex, but still pretty straightforward. For lists we have to iterate and free each member and then free the whole list. Other variables are freed in obvious manner.
+
+\begin{small}
+\begin{lstlisting}
+void freePoint(struct Point *ptr)
+{
+    if (!ptr) return;
+    free(ptr);
+}
+
+void freeTest(struct Test *ptr)
+{
+    int i;
+    if (!ptr) return;
+    if (ptr->desc) free(ptr->desc);
+    for (i=0; i<(ptr->point_count); i++) {
+        freePoint(ptr->point[i]);
+    }
+    free(ptr->pts);
+    free(ptr);
+}
+\end{lstlisting}
+\end{small}
+
+Serializing into XML is done using function \texttt{snprintf} from standard C library. We use snprintf variant, because we do not want to overflow the buffer. Functions for serializing simple types (\texttt{construct<Type>}) are defined in header file \texttt{convert.h}~-- see next subsection. When we serialize optional elements, we have to check whether the pointer is not NULL. When serializing repeating elements, we can iterate through the list because we know the length of it.
+\begin{small}
+\begin{lstlisting}
+int constructPoint(char *buf, int maxlen, struct Point *ptr)
+{
+    int pos = 0;
+    pos += snprintf(buf+pos, maxlen-pos, "<posx>");
+    pos += constructDouble(buf+pos, maxlen-pos, ptr->posx);
+    pos += snprintf(buf+pos, maxlen-pos, "</posx>");
+    pos += snprintf(buf+pos, maxlen-pos, "<posy>");
+    pos += constructDouble(buf+pos, maxlen-pos, ptr->posy);
+    pos += snprintf(buf+pos, maxlen-pos, "</posy>");
+    return pos;
+}
+
+int constructTest(char *buf, int maxlen, struct Test *ptr)
+{
+    int i, pos = 0;
+    pos += snprintf(buf, maxlen, "<Test>");
+    pos += snprintf(buf, maxlen-pos, "<id>");
+    pos += constructInt(buf+pos, maxlen-pos, ptr->id);
+    pos += snprintf(buf, maxlen-pos, "</id>");
+    if (ptr->desc) {
+        pos += snprintf(buf, maxlen-pos, "<desc>");
+        pos += constructString(buf+pos, maxlen-pos, ptr->desc);
+        pos += snprintf(buf, maxlen-pos, "</desc>");
+    }
+    for (i=0; i<(ptr->point_count); i++) {
+        pos += snprintf(buf, maxlen-pos, "<point>");
+        pos += constructPoint(buf, maxlen-pos, ptr->point[i]);
+        pos += snprintf(buf, maxlen-pos, "</point>");
+    }
+    pos += snprintf(buf, maxlen-pos, "</Test>");
+    return pos;
+}
+\end{lstlisting}
+\end{small}
+
+Deserializing or parsing from XML into structures is the most complicated part of the engine. It uses the stack automaton, which function is described in the Section~\ref{xml-automaton}. The main part is written as one function called \texttt{eatRule}. It tries to consume rewriting rule identified by variable \texttt{desc}, which corresponds to the nonterminal on the left side of it. The parser iterates over all rewriting rules using macro \texttt{forEachRule}. Parser then determines the type of the rule and tries one of the following:
+\begin{enumerate}
+ \item to consume all rules on the right side of the rule
+ \item to consume opening tag, rule between the tags and closing tags
+ \item to consume value of the type specified on the the right side of the rule
+\end{enumerate}
+When some of the called functions returns zero, meaning that it encountered some error, calling function returns zero too. If nonzero value was returned, we advance to the position that was returned.
+
+\begin{small}
+\begin{lstlisting}
+#define forEachRule(P,X) \
+        for ((P)=((X)&GMASK); \
+             (P)<=(((X)&GMASK)+((X)>>GSHIFT)); \
+             (P)++)
+
+int eatRule(char level, int pos, GUNIT desc)
+{
+    GUNIT i, j, r, *rule;
+    forEachRule(i, desc) {
+        rule = Parser_Grammar[i];
+        if (rule[0]) Parser_Push(level, i, pos);
+        r = pos;
+        switch(rule[0]) {
+            case 0:
+                j = 1;
+                while (rule[j] != -1) {
+                    r = eatRule(level, r, rule[j]);
+                    j++;
+                    if (!r) break;
+                }
+                break;
+            case 1:
+                eatWhiteSpace(Parser_Buf, Parser_BufLen, r);
+                r = eatStartTag(r, grammar_tag[rule[1]]);
+                if (!r) break;
+                r = eatRule(level+1, r, rule[2]);
+                if (!r) break;
+                r = eatEndTag(r, grammar_tag[rule[1]]);
+                if (!r) break;
+                eatWhiteSpace(Parser_Buf, Parser_BufLen, r);
+                break;
+            default:
+                r = eatValue(r, rule[0]);
+                break;
+        }
+        if (r) {
+            break;
+        } else {
+            if (rule[0]) Parser_Pop();
+        } 
+    }
+    return r;
+}
+\end{lstlisting}
+\end{small}
+
+Described parser core is used in deserializing functions. They assign parser grammar, buffer to be parsed and call function \texttt{eatRule()}. If it returns the same length as the length of input buffer (meaning that parsing reached end of message) structures are created and filled with the data. This is done in two steps. Function \texttt{eatRule()} fills internal temporary stack with via \texttt{Parser\_Push()} and \texttt{Parser\_Pop()}. Nest level, rule identifier and position in XML is stored. Value is removed from stack only in case of bad decision, so the stack is not empty after the operation but contains information how the buffer was processed. Functions \texttt{findTag()}, \texttt{countTags()} and \texttt{getValue()} take an advantage of this. First one searches for given opening tag from some position. Second one counts opening tags of the same type on the given level, this is useful for determining how large structure list should we create. Last function returns pointer to buffer so we can parse individual values of simple types.
+
+\begin{small}
+\begin{lstlisting}
+struct Point *parsePoint(int start) {
+  int idx;
+  struct Point *ret;
+  ret = allocPoint();
+  idx = findNextTag(start, tag_posx);
+  ret->posx = parseDouble((idx>=0)?getValue(idx+1):NULL);
+  idx = findNextTag(start, tag_posy);
+  ret->posy = parseDouble((idx>=0)?getValue(idx+1):NULL);
+  return ret;
+}
+
+struct Test *parseTest(char *buf, int len) {
+  int idx;
+  struct Test *ret;
+  int i, cnt;
+
+  Parser_Buf = buf;
+  Parser_BufLen = len;
+  Parser_Grammar = Test_grammar;
+  Parser_StackCount = 0;
+  if (eatRule(0, 0, 0) != len) return NULL;
+
+  ret = allocTest();
+  idx = findTagSame(0, tag_Test);
+  if (idx >= 0) {
+    idx = findNextTag(idx, tag_id);
+    ret->id = parseInt((idx>=0)?getValue(idx+1):NULL);
+
+    cnt = countTags(idx, tag_point);
+    ret->pts_count = cnt;
+    if (cnt > 0) {
+      ret->pts = allocPointList(cnt);
+      for (i=0; i<cnt; i++) {
+        idx = findNextTagSame(idx, tag_point);
+        ret->pts[i] = parsePoint(idx);
+      }
+    }
+    idx = findNextTag(idx, tag_desc);
+    ret->desc = parseString((idx>=0)?getValue(idx+1):NULL);
+  } else {
+    return NULL;
+  }
+}
+\end{lstlisting}
+\end{small}
+
+\subsection{\texttt{convert.h} and \texttt{convert.c}}
+\label{convertheader}
+
+Header file \texttt{convert.h} contains mapping from XML schema types to C types (using \texttt{typedef}, see the Table \ref{type-mapping}).
+
+\begin{table}[htb]
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|l|l|} \hline
+\label{type-mapping}
+\textbf{XML type} & \textbf{C type} & \textbf{XML type} & \textbf{C type} \\ \hline
+\textit{String} & \texttt{char *} & \textit{Boolean} & \texttt{char} \\
+\textit{Base64Binary} & \texttt{char *} & \textit{HexBinary} & \texttt{char *} \\
+\textit{Float} & \texttt{float} & \textit{Double} & \texttt{double} \\
+\textit{Byte} & \texttt{char} & \textit{UnsignedByte} & \texttt{unsigned char} \\
+\textit{Short} & \texttt{short} & \textit{UnsignedShort} & \texttt{unsigned short} \\
+\textit{Int} & \texttt{int} & \textit{UnsignedInt} & \texttt{unsigned int} \\
+\textit{Long} & \texttt{long} & \textit{UnsignedLong} & \texttt{unsigned long} \\
+\textit{Integer} & alias for Long & & \\
+\hline
+\end{tabular}
+\end{center}
+\caption{XML schema data types with mapping to C types used in EXCUSA}
+\end{table}
+
+This header file also exposes functions from source file \texttt{convert.c}. They are used to parse basic simple types from XML and to serialize them back. Usually functions from the standard C library like \texttt{atoi} or \texttt{snprintf}) are used. All conversions are done inside static buffers given as parameters to these functions thus no unreasonable allocating or freeing of memory is done. We will list some examples to give idea how the parsing is done. Some of the functions are implemented as macros because of their simplicity.
+
+\begin{small}
+\begin{lstlisting}
+Boolean parseBoolean(char *val) {
+        if (!val) return 0;
+        if (!strncmp(val, "true", 4)) return 1;
+        if (val[0] == '1') return 1;
+        return 0;
+}
+
+#define parseString(val) \
+          ((val) ? (String)val : (String)NULL);
+
+#define parseDouble(val) \
+          ((val) ? (Double)atof(val) : (Double)0.0)
+
+int constructBoolean(char *ptr, int maxlen, char val) {
+        if (maxlen <= 0) return 0;
+        *ptr = val ? '1' : '0';
+        return 1;
+}
+
+#define constructString(ptr, maxlen, val) \
+          snprintf((ptr), (maxlen), "%s", (val))
+
+#define constructDouble(ptr, maxlen, val) \
+          snprintf((ptr), (maxlen), "%f", (val))
+\end{lstlisting}
+\end{small}
+
+\subsection{\texttt{grammar.h} and \texttt{grammar.c}}
+\label{sub-grammar}
+These files contain grammar definitions for parser. Each tag and each type are enumerated, so we can index them with number. Each rewrite rule is represented as an array of numbers. Grammar is a list of these rewrite rules, thus it is stored as \texttt{int **}. We have only three types of rewriting rules when representing XML structure (see the Subsection~\ref{xml-grammar}). Each type is represented in different manner so the numbers have different meanings:
+
+\begin{enumerate}
+ \item \texttt{grammar[i] = $\left\lbrace 0, d_{1}, d_{2}, ... d_{n}, -1 \right\rbrace$;} \\ where
+    $d_{k}$ are rule descriptors (see below)
+ \item \texttt{grammar[i] =  $\left\lbrace 1, t, d \right\rbrace$;} \\ where
+    $t$ represents tag (index of tag in tags enum), $d$ represents rule descriptor (see below)
+ \item \texttt{grammar[i] =  $\left\lbrace 100 + t \right\rbrace$;} \\ where
+    $t$ represents type of value (index of type in types enum)
+\end{enumerate}
+
+Rule descriptor $d$ is an integer where lower 24 bits are index $i$ into grammar array. If higher 8 bits are set (let's mark this value $c$) parser knows it should try not only rewrite rule with index $i$ but all rewrite rules with indexes between $i$ and $i+c$. This is good when we have more rewrite rules with the same nonterminal on the left side. We could represent these values as two numbers, but with this little trick we can squeeze space requirements, which are pretty precious in microprogramming. Let's show representation by a simple example:
+
+\begin{table}[htb]
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|} \hline
+\textbf{rewrite rule} & \textbf{data structure} \\ \hline
+$A \rightarrow$ \texttt{<root>} $B$ \texttt{</root>} & \texttt{grammar[0] = $\left\lbrace 1, tag\_root, 1 \right\rbrace$;} \\
+$B \rightarrow C D$ & \texttt{grammar[1] = $\left\lbrace 0, 2, 3 + 1\ll24, -1 \right\rbrace$;} \\
+$C \rightarrow$ \texttt{<int>} $E$ \texttt{</int>} & \texttt{grammar[2] = $\left\lbrace 1, tag\_int, 5 \right\rbrace$;} \\
+$D \rightarrow$ \texttt{<str>} $F$ \texttt{</str>} & \texttt{grammar[3] = $\left\lbrace 1, tag\_str, 6\right\rbrace$;} \\
+$D \rightarrow$ & \texttt{grammar[4] = $\left\lbrace 0, -1 \right\rbrace$;} \\
+$E \rightarrow \left\lbrace Int \right\rbrace$    & \texttt{grammar[5] = $\left\lbrace 108 \right\rbrace$;} \\
+$F \rightarrow \left\lbrace String \right\rbrace$ & \texttt{grammar[6] = $\left\lbrace 100 \right\rbrace$;} \\ \hline
+\end{tabular}
+\end{center}
+\caption{Representation of rewrite rules in EXCUSA}
+\end{table}
+
+In our implementation we do not use actually integers to store grammar information. We use the following macros to be able to change \texttt{int} to some other type (when \texttt{int} it is too small or too big).
+
+\begin{small}
+\begin{lstlisting}
+#define GUNIT int
+#define GSHIFT (sizeof(GUNIT)*6)
+#define GMASK ((1<<GSHIFT)-1)
+\end{lstlisting}
+\end{small}
+
+\subsection{\texttt{client.c}}
+Source file \texttt{client.c} contains client network communication core written using standard POSIX sockets. It holds also all method stubs which create and send requests to server, receive responses from it and parse them. One static buffer is used for request and one for response so we can avoid unnecessary copying.
+
+\subsection{\texttt{server.c}}
+Core of the web service server is also written using standard POSIX sockets. This file contains server skeleton which listens to requests and calls methods from \texttt{server\_methods.h} to create responses. Server is meant to be lightweight, so no forking or threading is implemented. That is why we can also use static buffers for requests and responses. This behavior is similar to the one in client.
+
+\subsection{\texttt{server\_methods.h}}
+At start this file contains only empty web service methods. It should be edited by user manually who adds bodies to them and thus provide logic functionality of the web service.
+
+\subsection{\texttt{wsdl.c}}
+This file consists of only one variable of type \texttt{char *} which contains WSDL definition from \texttt{<service>.wsdl}. Unneeded white characters are removed to decrease size of object and output files. This value is sent by server to client when it requests definition of the web service.
+
+\subsection{\texttt{libclient.a} and \texttt{server}}
+These are the final output files. Binary \texttt{server} is a monolithic web service server. Clients should be created by linking \texttt{libclient.a} with user code, which uses remote method prototypes defined in header file \texttt{<service>.h}.
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[angle=90,height=18cm]{makefile.eps}
+ \end{center}
+ \caption{Visualized dependencies of the files}
+ \label{makeile}
+\end{figure}
+
+\chapter{Evaluation}
+
+To evaluate our solution we have chosen to benchmark it in real environment and to compare it with other existing implementations:
+\begin{itemize}
+ \item \textbf{gSOAP}\cite{gsoap} is C or C++ based and momentarily regarded as a ``standard'' for programming thin solutions
+ \item \textbf{bSOAP}\cite{bsoap} is a relatively new C++ based implementation that utilizes \textit{differential serialization} and \textit{deserialization} optimization techniques
+\end{itemize}
+
+\section{Size}
+\label{results-size}
+
+Size of the output is very important if we want to use the proposed solution to program microcontrollers. We used a simple WSDL file with one interface and four operations, generated the source codes for EXCUSA, gSOAP and bSOAP and compiled them on three architectures: \textbf{i386}, \textbf{avr} and \textbf{arm}. The first one was chosen for reference and the other two were picked, because they are used pretty often in microprogramming. We can expect similar sizes on the \textbf{m68k} platform like the ones we measured on the \textbf{arm}.  Source size was calculated by adding sizes of all files that were being compiled -- that means all C/C++ files and headers, without \texttt{Makefile}s and other helper scripts. Binary size was obtained by counting together the sizes of resulting executables and all non-standard shared libraries, that were created during the build time and are required for running the application. With rising complexity of the web service definition we can also expect the growth of the source and binary sizes. This increase will not be so dramatic in gSOAP and bSOAP case, because they have pretty large runtime. However, in EXCUSA we have to consider also this factor, because grammars representing XML schema together with stubs and skeletons of operations comprise significant fraction of the output. The measured sizes can be seen in the Table~\ref{comparison-sizes}.
+
+\begin{table}[htb]
+\begin{center}
+\tabcolsep=6pt
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\cline{3-8}
+\multicolumn{2}{c|}{} & \multicolumn{2}{c|}{\textbf{i386}} & \multicolumn{2}{c|}{\textbf{avr}} & \multicolumn{2}{c|}{\textbf{arm}}\\ \cline{2-8}
+\multicolumn{1}{c|}{} & source & client & server & client & server & client & server\\ \hline
+EXCUSA & 47193 & 15032 & 23264 & 22704 & 36360 & 25127 & 38974\\ \hline
+gSOAP & 561753 & 161812 & 161772 & - & - & 253215 & 253158\\ \hline
+bSOAP & 1363528 & 326892 & 326780 & - & - & - & -\\ \hline
+\end{tabular}
+\end{center}
+\caption{Output sizes (in bytes)}
+\label{comparison-sizes}
+\end{table}
+
+As we can see bSOAP and gSOAP have very similar size for client and server, because they link common runtime to both binaries. To compile on AVR architecture we had to remove all POSIX sockets code, so the shown value is the size without it. We hit the 128 KiB limit when compiling gSOAP or bSOAP for AVR and we did not succeed to create bSOAP binaries for ARM either, because of the various issues during linkage.
+
+\section{Network performance}
+\label{results-perf}
+
+We wanted to achieve not only good size but also to have fair performance when compared to other alternatives. We benchmarked on loopback of Intel Core Duo 1.83 GHz computer, network was tested when another Athlon XP 2600+ computer was connected to the mentioned one via 100Base-TX Ethernet and Cisco Catalyst 2950T 24 Switch. We tried both small and large packets to see how Ethernet frames fragmentation affects the performance. Request-response latency was measured with Wireshark, but the differences between implementation were not significant enough and the times were very similar to the ones which can be obtained by the \texttt{ping} command. The resulting measurements can be seen in the Table~\ref{comparison-performance}.
+
+\begin{table}[htb]
+\begin{center}
+\tabcolsep=6pt
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|r|r|r|r|}
+\cline{2-5}
+\multicolumn{1}{c|}{} & \multicolumn{2}{c|}{\textbf{loopback}} & \multicolumn{2}{c|}{\textbf{network}}\\
+\hline
+packet size & \multicolumn{1}{c|}{\textbf{256}} & \multicolumn{1}{c|}{\textbf{64k}}  & \multicolumn{1}{c|}{\textbf{256}} & \multicolumn{1}{c|}{\textbf{64k}} \\ \hline
+EXCUSA & 7692.9 & 233.0 & 257.4 & 28.3\\ \hline
+gSOAP & 2255.0 & 174.1 & 210.4 & 17.9\\ \hline
+bSOAP & 8956.4 & 816.8 & 922.2 & 135.7\\ \hline
+\end{tabular}
+\end{center}
+\caption{Performance (requests per second)}
+\label{comparison-performance}
+\end{table}
+
+We see that bSOAP outperforms the other two competitors when sending large requests (that is because it sends only values that have changed). EXCUSA gets along pretty well especially when dealing with smaller requests.
+
+\section{Profiling}
+\label{results-prof}
+
+We profiled EXCUSA to detect bottle-necks issues. Test were performed on the same computer clocked at 1.83 GHz using x86 \texttt{rdtsc} instruction\cite{intel}. This instruction returns a value that represents the count of ticks from processor reset. We can then calculate real duration in microseconds by dividing tick count with 1830. We again chose to test both small and large packets to see how the ratio between communication timeslot and parser timeslot changes. Measured values can be seen in the Table~\ref{table-speed}.
+
+\begin{table}[htb]
+\begin{center}
+\tabcolsep=6pt
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|l|r|r|r|r|}
+\cline{3-6}
+\multicolumn{2}{c|}{} & \multicolumn{2}{c|}{\textbf{256}} & \multicolumn{2}{c|}{\textbf{64k}} \\ \cline{3-6}
+\multicolumn{2}{c|}{} & \multicolumn{1}{c|}{\textbf{ticks}} & \multicolumn{1}{c|}{\textbf{$\mu$sec}} & \multicolumn{1}{c|}{\textbf{ticks}} & \multicolumn{1}{c|}{\textbf{$\mu$sec}} \\ \hline
+\multirow{2}{*}{\rotatebox{90}{client}} & 1) create request & 150 282 & 82 & 11 878 856 & 6491 \\ \cline{2-6}
+ & 2a) send request & 1 003 926 & 549 & 1 145 969 & 626 \\ \hline
+\hline
+\multirow{7}{*}{\rotatebox{90}{server}} & 2b) receive request & 180 795 109 & 98 795 & 180 849 878 & 98 825 \\ \cline{2-6}
+ & 3) parse request & 52 998 & 29 & 8 177 279 & 4468 \\ \cline{2-6}
+ & -- 3a) stack automaton & 20 427 & 11 & 4 594 216 & 2510 \\ \cline{2-6}
+ & -- 3b) parsing values & 11 913 & 7 & 3 541 692 & 1935 \\ \cline{2-6}
+ & 4) execute method & 1 100 & 1 & 101 783 & 56 \\ \cline{2-6}
+ & 5) construct response & 6 193 & 3 & 9 086 & 5 \\ \cline{2-6}
+ & 6a) send response & 35 002 & 19 & 49 214 & 27 \\ \hline
+\hline
+\multirow{4}{*}{\rotatebox{90}{client}} & 6b) receive response & 182 457 963 & 99 704 & 189 216 709 & 103 397 \\ \cline{2-6}
+ & 7) parse response & 65 582 & 36 & 77 275 & 42 \\ \cline{2-6}
+ & -- 7a) stack automaton & 16 753 & 9 & 23 771 & 13 \\ \cline{2-6}
+ & -- 7b) parsing values & 4 103 & 2 & 5 280 & 3 \\ \hline
+\end{tabular}
+\end{center}
+\caption{Performance (ticks and microseconds)}
+\label{table-speed}
+\end{table}
+
+At the beginning client creates request (1). This involves traversing through structures and serializing them into static buffer. Socket is opened and buffer is sent to it (2a). On the other side of connection server opens the sockets and reads data until end of the message is reached (2b). Message is then processed by parser which finds position of variables in XML (3a). These values are deserialized into structures (3b) and the method is executed (4). Response is constructed in buffer in similar fashion like request (5). Server sends response to waiting client (6a) which returns from sleep and reads data (6b). Response is again parsed like request before (7a) and values deserialized into structures (7b). 
+
+\chapter{Conclusion}
+
+\section{Summary}
+The primary objective of this work -- to design and implement a tool that would allow automated code generation for web services using XML grammars -- has been met. This objective can be divided into these partial accomplishments:
+\begin{itemize}
+ \item we have devised the formal description of the grammars which represent the XML documents -- Section~\ref{xml-grammar}
+ \item we have invented a system for the automatic creation of these grammars from the XML schema definitions -- Section~\ref{convert-xml-grammar}
+ \item we have found a way how to represent these grammars in procedural and object oriented languages (especially, but not exclusive, C) -- Subsection~\ref{sub-grammar}
+ \item we have created the effective parser, which forms pointers to the values in the XML document to avoid inefficient copying -- Section~\ref{xml-automaton} and Subsection~\ref{serviceh-commonc}
+ \item we have put together a way how to compose these values into structures that represent messages (thus deserializing the data from the XML) and have also implemented the reverse process (serializing these structures back to the XML) -- subsections \ref{serviceh-commonc} and \ref{convertheader}
+ \item we have built up a prototype application for creating web service's code from WSDL file by bringing mentioned parts together -- Section \ref{program-structure}
+ \item we have tested our solution in the conditions similar to the real ones and have compared it to other existing alternatives -- sections \ref{results-size}, \ref{results-perf} and \ref{results-prof}
+\end{itemize}
+
+\section{Discussion and future work}
+
+Since our application is in the prototype state there are still features that are not implemented or they are implemented partly. Most effort has been put to checking whether the grammar approach is competitive among other alternatives and optimizations. Therefore our compiler lacks complete WSDL support, in particular:
+\begin{itemize}
+ \item only WSDL 1.1 is supported, WSDL 2.0 is rather new standard (see Subsection \ref{wsdl-versions} for differences between 1.1 and 2.0) and even the large frameworks do not support it yet
+ \item complex types in XML schema cannot have attributes (remote procedure calls have usually all information stored in elements, attributes are used primarily in XML databases, where we have to protect the constraints of the data)
+ \item SOAP headers are not supported (we cannot create grammar for headers of unknown structure)
+ \item server is lightweight so it listens for connections only on one port
+\end{itemize}
+These problems and optimization of critical parts of the code could be addressed in future, together with brand new ideas like:
+\begin{itemize}
+ \item modifying the application to generate code for other languages than C (e.g. C++, Java, C\#, Python, Ruby, Perl, PHP, etc.)
+ \item creating module for Apache HTTP Server or any other server that supports extending the core functionality with modules
+ \item trying to combine more optimization methods together, like using grammars together with differential (de)serialization
+ \item investigating the possibilities of coexistence of the grammar approach with XOP\cite{w3c-xop} and MTOM\cite{w3c-mtom}
+\end{itemize}
+
+
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\bibitem{janecek}Janeček J.: \textit{Efficient SOAP Processing in Embedded Systems}, ecbs, p. 128, 11th IEEE International Conference and Workshop on the Engineering of Computer-Based Systems (ECBS'04), 2004.
+
+\bibitem{foja}Černá I., Křetínský M., Kučera A.: \textit{Automaty a formální jazyky I.}, Elportál, Brno : Masarykova univerzita, 29 November 2006.\\ \texttt{http://is.muni.cz/elportal/?id=703389}
+
+\bibitem{w3c-xml}Bray T., Paoli J., Sperberg-McQueen C. M., Maler E., Yergeau F.: \textit{Extensible Markup Language (XML)~1.0}, W3C Recommendation, 16 August 2006.\\ \texttt{http://www.w3.org/TR/2006/REC-xml-20060816/}
+
+\bibitem{w3c-xsd0}Fallside D. C., Walmsley P.: \textit{XML Schema Part~0: Primer}, W3C Recommendation, 28 October 2004.\\
+\texttt{http://www.w3.org/TR/2004/REC-xmlschema-0-20041028/}
+
+\bibitem{w3c-xsd2}Biron P. V., Malhotra A.: \textit{XML Schema Part~2: Datatypes}, W3C Recommendation, 28 October 2004.\\
+\texttt{http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/}
+
+\bibitem{w3c-xsd1}Thompson H. S., Beech D., Maloney M., Mendelsohn N.: \textit{XML Schema Part~1: Structures}, W3C Recommendation, 28 October 2004.\\ 
+\texttt{http://www.w3.org/TR/2004/REC-xmlschema-1-20041028/}
+
+\bibitem{w3c-soap0}Mitra N., Lafon Y.: \textit{SOAP Version 1.2 Part~0: Primer}, W3C Recommendation, 27 April 2007.\\
+\texttt{http://www.w3.org/TR/2007/REC-soap12-part0-20070427/}
+
+\bibitem{w3c-soap1}Gudgin M., Hadley M., Mendelsohn N., Moreau J.-J., Nielsen H. F., Karmarkar A., Lafon Y.: \textit{SOAP Version 1.2 Part~1: Messaging Framework}, W3C Recommendation, 27 April 2007.\\ \texttt{http://www.w3.org/TR/2007/REC-soap12-part1-20070427/}
+
+\bibitem{erl}Erl T.: \textit{Service-Oriented Architecture : A Field Guide to Integrating XML and Web Services}, Prentice Hall 2004.
+
+\bibitem{w3c-wsdl2}Chinnici R., Moreau J.-J., Ryman A., Weerawarana S.: \textit{Web Services Description Language (WSDL) Version~2.0 Part~1: Core Language}, W3C Recommendation, 26 June 2007.\\ \texttt{http://www.w3.org/TR/2007/REC-wsdl20-20070626/}
+
+\bibitem{w3c-wsdl}Christensen E., Curbera F., Meredith G., Weerawarana S.: \textit{Web Services Description Language (WSDL)~1.1}, W3C Note, 15 March 2001.\\ \texttt{http://www.w3.org/TR/2001/NOTE-wsdl-20010315}
+
+\bibitem{berstel-boasson}Berstel J., Boasson L.: \textit{Formal properties of XML grammars and languages}, Acta Inf. 38(9): 649-671 (2002).
+
+\bibitem{apache-axis}Apache. Web Services Project~-- Apache AXIS2.\\
+\texttt{http://ws.apache.org/axis2/}.
+
+\bibitem{gsoap}van Engelen R. A., Gallivan K.: \textit{The gSOAP Toolkit for Web Services and Peer-To-Peer Computing Networks}, in the proceedings of the 2nd IEEE International Symposium on Cluster Computing and the Grid, pages 128-135, May 21-24, 2002, Berlin, Germany.\\
+\texttt{http://www.cs.fsu.edu/~engelen/soap.html}
+
+\bibitem{bsoap}Abu-Ghazaleh N., Lewis M. J., Govindaraju M., "Differential Serialization for Optimized SOAP Performance," in proceedings of HPDC-13: IEEE International Symposium on High Performance Distributed Computing, Honolulu, Hawaii, pp. 55-64, June 2004.\\
+\texttt{http://www.cs.binghamton.edu/~nayef/bsoap/}
+
+\bibitem{intel}\textit{Intel® 64 and IA-32 Architectures Software Developer's Manual} -- Volume 3B: System Programming Guide, Part 2, Chapter 18\\
+\texttt{http://download.intel.com/design/processor/manuals/253669.pdf}
+
+\bibitem{w3c-xop}Gudgin M., Mendelsohn N., Nottingham M., Ruellan H.: \textit{XML-binary Optimized Packaging}, W3C Recommendation, 25 January 2005.\\ \texttt{http://www.w3.org/TR/2005/REC-xop10-20050125/}
+
+\bibitem{w3c-mtom}Gudgin M., Mendelsohn N., Nottingham M., Ruellan H.: \textit{SOAP Message Transmission Optimization Mechanism}, W3C Recommendation, 25 January 2005.\\ \texttt{http://www.w3.org/TR/2005/REC-soap12-mtom-20050125/}
+\end{thebibliography}
+
+\appendix
+\chapter{CD contents}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\multicolumn{2}{l}{\texttt{/readme.txt}} & ... readme file\\
+\multicolumn{2}{l}{\texttt{/excusa/}} & ... EXCUSA tool distribution \\
+& \texttt{lib/} & ... Java archives needed to run the application\\
+& \texttt{src/} & ... sources written in Java\\
+& \texttt{excusa} & ... launcher script for UNIX systems\\
+& \texttt{excusa.bat} &  ... launcher script for Microsoft Windows\\
+\multicolumn{2}{l}{\texttt{/excusa.pdf}} & ... thesis in Portable Document Format\\
+\multicolumn{2}{l}{\texttt{/excusa.ps}} & ... thesis in Postscript format\\
+\multicolumn{2}{l}{\texttt{/javadoc/}} & ... EXCUSA source documentation generated in Javadoc\\
+\multicolumn{2}{l}{\texttt{/tex/}} & ... \TeX~sources of the thesis (+ Dia and Inkscape images) \\
+\multicolumn{2}{l}{\texttt{/wsdl/}} & ... example WSDL files
+\end{tabular}
+\end{center}
+
+\end{document}

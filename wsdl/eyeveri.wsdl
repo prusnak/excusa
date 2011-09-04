@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://www.tilisoft.com/ws/eyeVeri/literalTypes" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://www.tilisoft.com/ws/eyeVeri/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://www.tilisoft.com/ws/eyeVeri/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.tilisoft.com/ws/eyeVeri/literalTypes">
+      <s:element name="IsValid">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserInput" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="VeriCodeHash" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsValidResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsValidResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Generate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TRKRegistrationCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="ReturnCodeType" type="s0:ReturnCodeTypeEnums" />
+            <s:element minOccurs="1" maxOccurs="1" name="ReturnImageType" type="s0:ReturnImageTypeEnums" />
+            <s:element minOccurs="1" maxOccurs="1" name="VeriLength" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="CodeType" type="s0:CodeTypeEnums" />
+            <s:element minOccurs="1" maxOccurs="1" name="CodeCase" type="s0:CodeCaseEnums" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="ReturnCodeTypeEnums">
+        <s:restriction base="s:string">
+          <s:enumeration value="VeriCode" />
+          <s:enumeration value="VeriCodeHash" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="ReturnImageTypeEnums">
+        <s:restriction base="s:string">
+          <s:enumeration value="ImageURLOnly" />
+          <s:enumeration value="ImageBytesOnly" />
+          <s:enumeration value="Both" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="CodeTypeEnums">
+        <s:restriction base="s:string">
+          <s:enumeration value="NumbersOnly" />
+          <s:enumeration value="LettersOnly" />
+          <s:enumeration value="Both" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="CodeCaseEnums">
+        <s:restriction base="s:string">
+          <s:enumeration value="LowercaseOnly" />
+          <s:enumeration value="UppercaseOnly" />
+          <s:enumeration value="Both" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GenerateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GenerateResult" type="s0:VeriInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="VeriInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Success" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="VeriCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ImageBytes" type="s:base64Binary" />
+          <s:element minOccurs="0" maxOccurs="1" name="ImageURL" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GenerateEx">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TRKRegistrationCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="ReturnCodeType" type="s0:ReturnCodeTypeEnums" />
+            <s:element minOccurs="1" maxOccurs="1" name="ReturnImageType" type="s0:ReturnImageTypeEnums" />
+            <s:element minOccurs="1" maxOccurs="1" name="VeriLength" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="CodeType" type="s0:CodeTypeEnums" />
+            <s:element minOccurs="1" maxOccurs="1" name="CodeCase" type="s0:CodeCaseEnums" />
+            <s:element minOccurs="0" maxOccurs="1" name="BackColor" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ForeColor" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="FontName" type="s0:FontNameEnums" />
+            <s:element minOccurs="1" maxOccurs="1" name="Pattern" type="s0:PatternEnums" />
+            <s:element minOccurs="1" maxOccurs="1" name="PatternType" type="s0:PatternTypeEnums" />
+            <s:element minOccurs="0" maxOccurs="1" name="PatternColor" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="ImageWidth" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="ImageHeight" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="FontNameEnums">
+        <s:restriction base="s:string">
+          <s:enumeration value="Arial" />
+          <s:enumeration value="ArialBlack" />
+          <s:enumeration value="BlackChancery" />
+          <s:enumeration value="CenturyGothic" />
+          <s:enumeration value="ComicSansMS" />
+          <s:enumeration value="Computerfont" />
+          <s:enumeration value="CourierNew" />
+          <s:enumeration value="Impact" />
+          <s:enumeration value="Inkpen2Script" />
+          <s:enumeration value="MonotypeCorsiva" />
+          <s:enumeration value="Signature" />
+          <s:enumeration value="Thickhead" />
+          <s:enumeration value="TimesNewRoman" />
+          <s:enumeration value="Typewriter" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="PatternEnums">
+        <s:restriction base="s:string">
+          <s:enumeration value="None" />
+          <s:enumeration value="Grid" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="PatternTypeEnums">
+        <s:restriction base="s:string">
+          <s:enumeration value="Dash" />
+          <s:enumeration value="DashDot" />
+          <s:enumeration value="DashDotDot" />
+          <s:enumeration value="Dot" />
+          <s:enumeration value="Solid" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GenerateExResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GenerateExResult" type="s0:VeriInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="IsValidSoapIn">
+    <wsdl:part name="parameters" element="s0:IsValid" />
+  </wsdl:message>
+  <wsdl:message name="IsValidSoapOut">
+    <wsdl:part name="parameters" element="s0:IsValidResponse" />
+  </wsdl:message>
+  <wsdl:message name="GenerateSoapIn">
+    <wsdl:part name="parameters" element="s0:Generate" />
+  </wsdl:message>
+  <wsdl:message name="GenerateSoapOut">
+    <wsdl:part name="parameters" element="s0:GenerateResponse" />
+  </wsdl:message>
+  <wsdl:message name="GenerateExSoapIn">
+    <wsdl:part name="parameters" element="s0:GenerateEx" />
+  </wsdl:message>
+  <wsdl:message name="GenerateExSoapOut">
+    <wsdl:part name="parameters" element="s0:GenerateExResponse" />
+  </wsdl:message>
+  <wsdl:portType name="eyeVeriSoap">
+    <wsdl:operation name="IsValid">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Verify the validity of user input against a VeriCodeHash (generated).</documentation>
+      <wsdl:input message="tns:IsValidSoapIn" />
+      <wsdl:output message="tns:IsValidSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Generate">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Generate image verification data.  Note: TRKRegistrationCode parameter can be blank string.</documentation>
+      <wsdl:input message="tns:GenerateSoapIn" />
+      <wsdl:output message="tns:GenerateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GenerateEx">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Generate image verification data with more options.  Note: TRKRegistrationCode parameter can be blank string.</documentation>
+      <wsdl:input message="tns:GenerateExSoapIn" />
+      <wsdl:output message="tns:GenerateExSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="eyeVeriSoap" type="tns:eyeVeriSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" />
+    <wsdl:operation name="IsValid">
+      <soap:operation soapAction="http://www.tilisoft.com/ws/eyeVeri/IsValid" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Generate">
+      <soap:operation soapAction="http://www.tilisoft.com/ws/eyeVeri/Generate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GenerateEx">
+      <soap:operation soapAction="http://www.tilisoft.com/ws/eyeVeri/GenerateEx" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="eyeVeri">
+    <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Provides image verification generation.</documentation>
+    <wsdl:port name="eyeVeriSoap" binding="tns:eyeVeriSoap">
+      <soap:address location="http://www.tilisoft.com/ws/eyeVeri/eyeVeri.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

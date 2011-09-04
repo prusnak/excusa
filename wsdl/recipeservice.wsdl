@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://www.ecuisine.org/webservices" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://www.ecuisine.org/webservices" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.ecuisine.org/webservices">
+      <s:element name="GetRecipe">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="id" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="serviceID" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetRecipeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetRecipeResult" type="tns:WRecipe" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WRecipe">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ID" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Directions" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Servings" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Ingredients" type="tns:ArrayOfWIngredient" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfWIngredient">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="item" type="tns:WIngredient" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WIngredient">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Quantity" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Measurement" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SearchRecipes">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="criteria" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="pageNumber" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="serviceID" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SearchRecipesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SearchRecipesResult" type="tns:WRecipeResults" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WRecipeResults">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="TotalCount" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="PageSize" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Recipes" type="tns:ArrayOfWRecipe" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfWRecipe">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="item" nillable="true" type="tns:WRecipe" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetRecipeSoapIn">
+    <wsdl:part name="parameters" element="tns:GetRecipe" />
+  </wsdl:message>
+  <wsdl:message name="GetRecipeSoapOut">
+    <wsdl:part name="parameters" element="tns:GetRecipeResponse" />
+  </wsdl:message>
+  <wsdl:message name="SearchRecipesSoapIn">
+    <wsdl:part name="parameters" element="tns:SearchRecipes" />
+  </wsdl:message>
+  <wsdl:message name="SearchRecipesSoapOut">
+    <wsdl:part name="parameters" element="tns:SearchRecipesResponse" />
+  </wsdl:message>
+  <wsdl:portType name="RecipeServiceSoap">
+    <wsdl:operation name="GetRecipe">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Return one recipe based on id</wsdl:documentation>
+      <wsdl:input message="tns:GetRecipeSoapIn" />
+      <wsdl:output message="tns:GetRecipeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SearchRecipes">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Search recipes. Page Number is 0 based.</wsdl:documentation>
+      <wsdl:input message="tns:SearchRecipesSoapIn" />
+      <wsdl:output message="tns:SearchRecipesSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="RecipeServiceSoap" type="tns:RecipeServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetRecipe">
+      <soap:operation soapAction="http://www.ecuisine.org/webservices/GetRecipe" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchRecipes">
+      <soap:operation soapAction="http://www.ecuisine.org/webservices/SearchRecipes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="RecipeServiceSoap12" type="tns:RecipeServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetRecipe">
+      <soap12:operation soapAction="http://www.ecuisine.org/webservices/GetRecipe" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchRecipes">
+      <soap12:operation soapAction="http://www.ecuisine.org/webservices/SearchRecipes" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="RecipeService">
+    <wsdl:port name="RecipeServiceSoap" binding="tns:RecipeServiceSoap">
+      <soap:address location="http://icuisine.net/webservices/RecipeService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="RecipeServiceSoap12" binding="tns:RecipeServiceSoap12">
+      <soap12:address location="http://icuisine.net/webservices/RecipeService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

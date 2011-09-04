@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://xmlme.com/WebServices" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://xmlme.com/WebServices" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://xmlme.com/WebServices">
+      <s:element name="FindVideoGames">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Search" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="FindVideoGamesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FindVideoGamesResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="FindVideoGamesSoapIn">
+    <wsdl:part name="parameters" element="tns:FindVideoGames" />
+  </wsdl:message>
+  <wsdl:message name="FindVideoGamesSoapOut">
+    <wsdl:part name="parameters" element="tns:FindVideoGamesResponse" />
+  </wsdl:message>
+  <wsdl:message name="FindVideoGamesHttpGetIn">
+    <wsdl:part name="Search" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="FindVideoGamesHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="FindVideoGamesHttpPostIn">
+    <wsdl:part name="Search" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="FindVideoGamesHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:portType name="VideoGamesFinderSoap">
+    <wsdl:operation name="FindVideoGames">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Accepts a search string and returns a URL pointing to the video games search results. See http://www.xmlme.com for a sample client and additional details.</wsdl:documentation>
+      <wsdl:input message="tns:FindVideoGamesSoapIn" />
+      <wsdl:output message="tns:FindVideoGamesSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="VideoGamesFinderHttpGet">
+    <wsdl:operation name="FindVideoGames">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Accepts a search string and returns a URL pointing to the video games search results. See http://www.xmlme.com for a sample client and additional details.</wsdl:documentation>
+      <wsdl:input message="tns:FindVideoGamesHttpGetIn" />
+      <wsdl:output message="tns:FindVideoGamesHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="VideoGamesFinderHttpPost">
+    <wsdl:operation name="FindVideoGames">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Accepts a search string and returns a URL pointing to the video games search results. See http://www.xmlme.com for a sample client and additional details.</wsdl:documentation>
+      <wsdl:input message="tns:FindVideoGamesHttpPostIn" />
+      <wsdl:output message="tns:FindVideoGamesHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="VideoGamesFinderSoap" type="tns:VideoGamesFinderSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="FindVideoGames">
+      <soap:operation soapAction="http://xmlme.com/WebServices/FindVideoGames" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="VideoGamesFinderSoap12" type="tns:VideoGamesFinderSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="FindVideoGames">
+      <soap12:operation soapAction="http://xmlme.com/WebServices/FindVideoGames" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="VideoGamesFinderHttpGet" type="tns:VideoGamesFinderHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="FindVideoGames">
+      <http:operation location="/FindVideoGames" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="VideoGamesFinderHttpPost" type="tns:VideoGamesFinderHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="FindVideoGames">
+      <http:operation location="/FindVideoGames" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VideoGamesFinder">
+    <wsdl:port name="VideoGamesFinderSoap" binding="tns:VideoGamesFinderSoap">
+      <soap:address location="http://www.xmlme.com/WSVideoGames.asmx" />
+    </wsdl:port>
+    <wsdl:port name="VideoGamesFinderSoap12" binding="tns:VideoGamesFinderSoap12">
+      <soap12:address location="http://www.xmlme.com/WSVideoGames.asmx" />
+    </wsdl:port>
+    <wsdl:port name="VideoGamesFinderHttpGet" binding="tns:VideoGamesFinderHttpGet">
+      <http:address location="http://www.xmlme.com/WSVideoGames.asmx" />
+    </wsdl:port>
+    <wsdl:port name="VideoGamesFinderHttpPost" binding="tns:VideoGamesFinderHttpPost">
+      <http:address location="http://www.xmlme.com/WSVideoGames.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

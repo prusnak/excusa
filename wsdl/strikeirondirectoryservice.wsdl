@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:si="http://www.strikeiron.com" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://www.strikeirion.com/webservices" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://www.strikeirion.com/webservices" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.strikeirion.com/webservices">
+      <s:element name="GetRemainingHits">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseKey" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetRemainingHitsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseStatus" type="tns:LicStatus" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="LicStatus">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="status_code" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="status_string" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="remaining" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetAllPublicServices">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseKey" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAllPublicServicesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="WebServices" type="tns:ArrayOfWebServiceInfo" />
+            <s:element minOccurs="0" maxOccurs="1" name="ResponseStatus" type="tns:RespStatus" />
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseStatus" type="tns:LicStatus" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfWebServiceInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="WebServiceInfo" nillable="true" type="tns:WebServiceInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WebServiceInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="WebServiceID" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Description" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="WSDL" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="InfoPage" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OnlineAnalyzerURL" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ProviderName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ProviderWebSite" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="RespStatus">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Response_Code" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Response_String" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SearchWebServices">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseKey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="KeyWord" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SearchWebServicesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="WebServices" type="tns:ArrayOfWebServiceInfo" />
+            <s:element minOccurs="0" maxOccurs="1" name="ResponseStatus" type="tns:RespStatus" />
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseStatus" type="tns:LicStatus" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWebServiceByID">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseKey" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="WebServiceID" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWebServiceByIDResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TheWebService" type="tns:WebServiceInfo" />
+            <s:element minOccurs="0" maxOccurs="1" name="ResponseStatus" type="tns:RespStatus" />
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseStatus" type="tns:LicStatus" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWebServiceByWSDL">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseKey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="WSDL" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWebServiceByWSDLResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TheWebService" type="tns:WebServiceInfo" />
+            <s:element minOccurs="0" maxOccurs="1" name="ResponseStatus" type="tns:RespStatus" />
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseStatus" type="tns:LicStatus" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetKnowledgeBaseListByID">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseKey" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="WebServiceID" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetKnowledgeBaseListByIDResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="KnowledgebaseInfoList" type="tns:ArrayOfKnowledgeBaseInfo" />
+            <s:element minOccurs="0" maxOccurs="1" name="ResponseStatus" type="tns:RespStatus" />
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseStatus" type="tns:LicStatus" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfKnowledgeBaseInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="KnowledgeBaseInfo" nillable="true" type="tns:KnowledgeBaseInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="KnowledgeBaseInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="WebServiceID" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Entry" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Path" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetKnowledgeBaseListByWSDL">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseKey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="wsdl" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetKnowledgeBaseListByWSDLResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="KnowledgebaseInfoList" type="tns:ArrayOfKnowledgeBaseInfo" />
+            <s:element minOccurs="0" maxOccurs="1" name="ResponseStatus" type="tns:RespStatus" />
+            <s:element minOccurs="0" maxOccurs="1" name="LicenseStatus" type="tns:LicStatus" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetRemainingHitsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetRemainingHits" />
+  </wsdl:message>
+  <wsdl:message name="GetRemainingHitsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetRemainingHitsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAllPublicServicesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAllPublicServices" />
+  </wsdl:message>
+  <wsdl:message name="GetAllPublicServicesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAllPublicServicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="SearchWebServicesSoapIn">
+    <wsdl:part name="parameters" element="tns:SearchWebServices" />
+  </wsdl:message>
+  <wsdl:message name="SearchWebServicesSoapOut">
+    <wsdl:part name="parameters" element="tns:SearchWebServicesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetWebServiceByIDSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWebServiceByID" />
+  </wsdl:message>
+  <wsdl:message name="GetWebServiceByIDSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWebServiceByIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetWebServiceByWSDLSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWebServiceByWSDL" />
+  </wsdl:message>
+  <wsdl:message name="GetWebServiceByWSDLSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWebServiceByWSDLResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetKnowledgeBaseListByIDSoapIn">
+    <wsdl:part name="parameters" element="tns:GetKnowledgeBaseListByID" />
+  </wsdl:message>
+  <wsdl:message name="GetKnowledgeBaseListByIDSoapOut">
+    <wsdl:part name="parameters" element="tns:GetKnowledgeBaseListByIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetKnowledgeBaseListByWSDLSoapIn">
+    <wsdl:part name="parameters" element="tns:GetKnowledgeBaseListByWSDL" />
+  </wsdl:message>
+  <wsdl:message name="GetKnowledgeBaseListByWSDLSoapOut">
+    <wsdl:part name="parameters" element="tns:GetKnowledgeBaseListByWSDLResponse" />
+  </wsdl:message>
+  <wsdl:portType name="StrikeIronDirectoryServiceSoap">
+    <wsdl:operation name="GetRemainingHits">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return the remaining hits of this license key for current month</documentation>
+      <wsdl:input message="tns:GetRemainingHitsSoapIn" />
+      <wsdl:output message="tns:GetRemainingHitsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPublicServices">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return all public Web services in StrikeIron directory</documentation>
+      <wsdl:input message="tns:GetAllPublicServicesSoapIn" />
+      <wsdl:output message="tns:GetAllPublicServicesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SearchWebServices">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return all public Web services that contains the specified keyword(s) in StrikeIron directory</documentation>
+      <wsdl:input message="tns:SearchWebServicesSoapIn" />
+      <wsdl:output message="tns:SearchWebServicesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWebServiceByID">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return the Web service in StrikeIron directory with the ID</documentation>
+      <wsdl:input message="tns:GetWebServiceByIDSoapIn" />
+      <wsdl:output message="tns:GetWebServiceByIDSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWebServiceByWSDL">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return the Web service in StrikeIron directory with the WSDL</documentation>
+      <wsdl:input message="tns:GetWebServiceByWSDLSoapIn" />
+      <wsdl:output message="tns:GetWebServiceByWSDLSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetKnowledgeBaseListByID">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return all knowledge base for a Web service with the specified ID</documentation>
+      <wsdl:input message="tns:GetKnowledgeBaseListByIDSoapIn" />
+      <wsdl:output message="tns:GetKnowledgeBaseListByIDSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetKnowledgeBaseListByWSDL">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return all knowledge base for a Web service with the specified wsdl url</documentation>
+      <wsdl:input message="tns:GetKnowledgeBaseListByWSDLSoapIn" />
+      <wsdl:output message="tns:GetKnowledgeBaseListByWSDLSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="StrikeIronDirectoryServiceSoap" type="tns:StrikeIronDirectoryServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <wsdl:operation name="GetRemainingHits">
+      <soap:operation soapAction="http://www.strikeirion.com/webservices/GetRemainingHits" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPublicServices">
+      <soap:operation soapAction="http://www.strikeirion.com/webservices/GetAllPublicServices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchWebServices">
+      <soap:operation soapAction="http://www.strikeirion.com/webservices/SearchWebServices" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWebServiceByID">
+      <soap:operation soapAction="http://www.strikeirion.com/webservices/GetWebServiceByID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWebServiceByWSDL">
+      <soap:operation soapAction="http://www.strikeirion.com/webservices/GetWebServiceByWSDL" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetKnowledgeBaseListByID">
+      <soap:operation soapAction="http://www.strikeirion.com/webservices/GetKnowledgeBaseListByID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetKnowledgeBaseListByWSDL">
+      <soap:operation soapAction="http://www.strikeirion.com/webservices/GetKnowledgeBaseListByWSDL" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="StrikeIronDirectoryService">
+    <wsdl:port name="StrikeIronDirectoryServiceSoap" binding="tns:StrikeIronDirectoryServiceSoap">
+      <soap:address location="http://ws.strikeiron.com/StrikeIron/StrikeIronDirectoryService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

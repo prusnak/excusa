@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><definitions xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:si="http://soapinterop.org/xsd" xmlns:tns="http://dietrich.ganx4.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://dietrich.ganx4.com/"><types><xsd:schema targetNamespace="http://dietrich.ganx4.com/"
+>
+ <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+ <xsd:import namespace="http://schemas.xmlsoap.org/wsdl/" />
+ <xsd:complexType name="results">
+  <xsd:all>
+   <xsd:element name="kerry" type="xsd:string"/>
+   <xsd:element name="bush" type="xsd:string"/>
+  </xsd:all>
+ </xsd:complexType>
+</xsd:schema>
+</types><message name="whoisgoingtobepresidentRequest"></message><message name="whoisgoingtobepresidentResponse"><part name="return" type="tns:results" /></message><portType name="Presidential Election Results 2004PortType"><operation name="whoisgoingtobepresident"><input message="tns:whoisgoingtobepresidentRequest"/><output message="tns:whoisgoingtobepresidentResponse"/></operation></portType><binding name="Presidential Election Results 2004Binding" type="tns:Presidential Election Results 2004PortType"><soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/><operation name="whoisgoingtobepresident"><soap:operation soapAction="http://dietrich.ganx4.com/president/server.php/whoisgoingtobepresident" style="rpc"/><input><soap:body use="encoded" namespace="http://dietrich.ganx4.com/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input><output><soap:body use="encoded" namespace="http://dietrich.ganx4.com/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output></operation></binding><service name="Presidential Election Results 2004"><port name="Presidential Election Results 2004Port" binding="tns:Presidential Election Results 2004Binding"><soap:address location="http://dietrich.ganx4.com/president/server.php"/></port></service></definitions>

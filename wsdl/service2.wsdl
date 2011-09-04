@@ -1,0 +1,1250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://ejse.com/WeatherService/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://ejse.com/WeatherService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://ejse.com/WeatherService/">
+      <s:element name="GetWeatherInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWeatherInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetWeatherInfoResult" type="tns:WeatherInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WeatherInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Location" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="IconIndex" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Temprature" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="FeelsLike" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Forecast" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Visibility" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Pressure" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DewPoint" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UVIndex" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Humidity" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Wind" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ReportedAt" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="LastUpdated" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="UserCredentials" type="tns:UserCredentials" />
+      <s:complexType name="UserCredentials">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetWeatherInfo2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWeatherInfo2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetWeatherInfo2Result" type="tns:WeatherInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetExtendedWeatherInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetExtendedWeatherInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetExtendedWeatherInfoResult" type="tns:ExtendedWeatherInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ExtendedWeatherInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Info" type="tns:WeatherInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day1" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day2" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day3" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day4" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day5" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day6" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day7" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day8" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day9" type="tns:DayForecastInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DayForecastInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Day" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Date" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="IconIndex" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Forecast" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="High" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Low" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="PrecipChance" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetExtendedWeatherInfo2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetExtendedWeatherInfo2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetExtendedWeatherInfo2Result" type="tns:ExtendedWeatherInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetNineDayForecastInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetNineDayForecastInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetNineDayForecastInfoResult" type="tns:NineDayForecastInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="NineDayForecastInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Day1" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day2" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day3" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day4" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day5" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day6" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day7" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day8" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day9" type="tns:DayForecastInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetNineDayForecastInfo2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetNineDayForecastInfo2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetNineDayForecastInfo2Result" type="tns:NineDayForecastInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetThreeDayForecastInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetThreeDayForecastInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetThreeDayForecastInfoResult" type="tns:ThreeDayForecastInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ThreeDayForecastInfo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Day1" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day2" type="tns:DayForecastInfo" />
+          <s:element minOccurs="1" maxOccurs="1" name="Day3" type="tns:DayForecastInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetThreeDayForecastInfo2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetThreeDayForecastInfo2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetThreeDayForecastInfo2Result" type="tns:ThreeDayForecastInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDayForecastInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="day" type="tns:ForecastDays" />
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="ForecastDays">
+        <s:restriction base="s:string">
+          <s:enumeration value="Day1" />
+          <s:enumeration value="Day2" />
+          <s:enumeration value="Day3" />
+          <s:enumeration value="Day4" />
+          <s:enumeration value="Day5" />
+          <s:enumeration value="Day6" />
+          <s:enumeration value="Day7" />
+          <s:enumeration value="Day8" />
+          <s:enumeration value="Day9" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetDayForecastInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetDayForecastInfoResult" type="tns:DayForecastInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDayForecastInfo2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="day" type="tns:ForecastDays" />
+            <s:element minOccurs="1" maxOccurs="1" name="zipCode" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDayForecastInfo2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetDayForecastInfo2Result" type="tns:DayForecastInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIraqWeatherInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="city" type="tns:IraqCities" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="IraqCities">
+        <s:restriction base="s:string">
+          <s:enumeration value="AlAzamiyah" />
+          <s:enumeration value="AlBasrah" />
+          <s:enumeration value="AlHillah" />
+          <s:enumeration value="AlKarkh" />
+          <s:enumeration value="AlKazimiyah" />
+          <s:enumeration value="AlKut" />
+          <s:enumeration value="AnNasiriyah" />
+          <s:enumeration value="Baghdad" />
+          <s:enumeration value="Baqubah" />
+          <s:enumeration value="Mosul" />
+          <s:enumeration value="Nineveh" />
+          <s:enumeration value="TallKayf" />
+          <s:enumeration value="Najaf" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetIraqWeatherInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetIraqWeatherInfoResult" type="tns:WeatherInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIraqWeatherInfo2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="city" type="tns:IraqCities" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIraqWeatherInfo2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetIraqWeatherInfo2Result" type="tns:WeatherInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIraqExtendedWeatherInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="city" type="tns:IraqCities" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIraqExtendedWeatherInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetIraqExtendedWeatherInfoResult" type="tns:ExtendedWeatherInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIraqExtendedWeatherInfo2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="userName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="city" type="tns:IraqCities" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIraqExtendedWeatherInfo2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetIraqExtendedWeatherInfo2Result" type="tns:ExtendedWeatherInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="WeatherInfo" type="tns:WeatherInfo" />
+      <s:element name="ExtendedWeatherInfo" type="tns:ExtendedWeatherInfo" />
+      <s:element name="NineDayForecastInfo" type="tns:NineDayForecastInfo" />
+      <s:element name="ThreeDayForecastInfo" type="tns:ThreeDayForecastInfo" />
+      <s:element name="DayForecastInfo" type="tns:DayForecastInfo" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetWeatherInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWeatherInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfoUserCredentials">
+    <wsdl:part name="UserCredentials" element="tns:UserCredentials" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfo2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetWeatherInfo2" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfo2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetWeatherInfo2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetExtendedWeatherInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfoUserCredentials">
+    <wsdl:part name="UserCredentials" element="tns:UserCredentials" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfo2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetExtendedWeatherInfo2" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfo2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetExtendedWeatherInfo2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetNineDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetNineDayForecastInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfoUserCredentials">
+    <wsdl:part name="UserCredentials" element="tns:UserCredentials" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfo2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetNineDayForecastInfo2" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfo2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetNineDayForecastInfo2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetThreeDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetThreeDayForecastInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfoUserCredentials">
+    <wsdl:part name="UserCredentials" element="tns:UserCredentials" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfo2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetThreeDayForecastInfo2" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfo2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetThreeDayForecastInfo2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDayForecastInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfoUserCredentials">
+    <wsdl:part name="UserCredentials" element="tns:UserCredentials" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfo2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetDayForecastInfo2" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfo2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetDayForecastInfo2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetIraqWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetIraqWeatherInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfoUserCredentials">
+    <wsdl:part name="UserCredentials" element="tns:UserCredentials" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfo2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetIraqWeatherInfo2" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfo2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetIraqWeatherInfo2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetIraqExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetIraqExtendedWeatherInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfoUserCredentials">
+    <wsdl:part name="UserCredentials" element="tns:UserCredentials" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfo2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetIraqExtendedWeatherInfo2" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfo2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetIraqExtendedWeatherInfo2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfoHttpGetIn">
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:WeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfo2HttpGetIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfo2HttpGetOut">
+    <wsdl:part name="Body" element="tns:WeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfoHttpGetIn">
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:ExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfo2HttpGetIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfo2HttpGetOut">
+    <wsdl:part name="Body" element="tns:ExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfoHttpGetIn">
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:NineDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfo2HttpGetIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfo2HttpGetOut">
+    <wsdl:part name="Body" element="tns:NineDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfoHttpGetIn">
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:ThreeDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfo2HttpGetIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfo2HttpGetOut">
+    <wsdl:part name="Body" element="tns:ThreeDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfoHttpGetIn">
+    <wsdl:part name="day" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:DayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfo2HttpGetIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="day" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfo2HttpGetOut">
+    <wsdl:part name="Body" element="tns:DayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfoHttpGetIn">
+    <wsdl:part name="city" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:WeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfo2HttpGetIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="city" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfo2HttpGetOut">
+    <wsdl:part name="Body" element="tns:WeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfoHttpGetIn">
+    <wsdl:part name="city" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:ExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfo2HttpGetIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="city" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfo2HttpGetOut">
+    <wsdl:part name="Body" element="tns:ExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfoHttpPostIn">
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:WeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfo2HttpPostIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWeatherInfo2HttpPostOut">
+    <wsdl:part name="Body" element="tns:WeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfoHttpPostIn">
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:ExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfo2HttpPostIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetExtendedWeatherInfo2HttpPostOut">
+    <wsdl:part name="Body" element="tns:ExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfoHttpPostIn">
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:NineDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfo2HttpPostIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetNineDayForecastInfo2HttpPostOut">
+    <wsdl:part name="Body" element="tns:NineDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfoHttpPostIn">
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:ThreeDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfo2HttpPostIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetThreeDayForecastInfo2HttpPostOut">
+    <wsdl:part name="Body" element="tns:ThreeDayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfoHttpPostIn">
+    <wsdl:part name="day" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:DayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfo2HttpPostIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="day" type="s:string" />
+    <wsdl:part name="zipCode" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetDayForecastInfo2HttpPostOut">
+    <wsdl:part name="Body" element="tns:DayForecastInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfoHttpPostIn">
+    <wsdl:part name="city" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:WeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfo2HttpPostIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="city" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqWeatherInfo2HttpPostOut">
+    <wsdl:part name="Body" element="tns:WeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfoHttpPostIn">
+    <wsdl:part name="city" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:ExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfo2HttpPostIn">
+    <wsdl:part name="userName" type="s:string" />
+    <wsdl:part name="password" type="s:string" />
+    <wsdl:part name="city" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIraqExtendedWeatherInfo2HttpPostOut">
+    <wsdl:part name="Body" element="tns:ExtendedWeatherInfo" />
+  </wsdl:message>
+  <wsdl:portType name="ServiceSoap">
+    <wsdl:operation name="GetWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetWeatherInfoSoapIn" />
+      <wsdl:output message="tns:GetWeatherInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetWeatherInfo2SoapIn" />
+      <wsdl:output message="tns:GetWeatherInfo2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns extended weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetExtendedWeatherInfoSoapIn" />
+      <wsdl:output message="tns:GetExtendedWeatherInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns extended weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetExtendedWeatherInfo2SoapIn" />
+      <wsdl:output message="tns:GetExtendedWeatherInfo2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetNineDayForecastInfoSoapIn" />
+      <wsdl:output message="tns:GetNineDayForecastInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetNineDayForecastInfo2SoapIn" />
+      <wsdl:output message="tns:GetNineDayForecastInfo2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns three day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetThreeDayForecastInfoSoapIn" />
+      <wsdl:output message="tns:GetThreeDayForecastInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns three day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetThreeDayForecastInfo2SoapIn" />
+      <wsdl:output message="tns:GetThreeDayForecastInfo2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather forecast information for a valid given U.S. zipcode and day.</documentation>
+      <wsdl:input message="tns:GetDayForecastInfoSoapIn" />
+      <wsdl:output message="tns:GetDayForecastInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather forecast information for a valid given U.S. zipcode and day.</documentation>
+      <wsdl:input message="tns:GetDayForecastInfo2SoapIn" />
+      <wsdl:output message="tns:GetDayForecastInfo2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid Iraq city.</documentation>
+      <wsdl:input message="tns:GetIraqWeatherInfoSoapIn" />
+      <wsdl:output message="tns:GetIraqWeatherInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid Iraq city.</documentation>
+      <wsdl:input message="tns:GetIraqWeatherInfo2SoapIn" />
+      <wsdl:output message="tns:GetIraqWeatherInfo2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetIraqExtendedWeatherInfoSoapIn" />
+      <wsdl:output message="tns:GetIraqExtendedWeatherInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetIraqExtendedWeatherInfo2SoapIn" />
+      <wsdl:output message="tns:GetIraqExtendedWeatherInfo2SoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpGet">
+    <wsdl:operation name="GetWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetWeatherInfoHttpGetIn" />
+      <wsdl:output message="tns:GetWeatherInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetWeatherInfo2HttpGetIn" />
+      <wsdl:output message="tns:GetWeatherInfo2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns extended weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetExtendedWeatherInfoHttpGetIn" />
+      <wsdl:output message="tns:GetExtendedWeatherInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns extended weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetExtendedWeatherInfo2HttpGetIn" />
+      <wsdl:output message="tns:GetExtendedWeatherInfo2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetNineDayForecastInfoHttpGetIn" />
+      <wsdl:output message="tns:GetNineDayForecastInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetNineDayForecastInfo2HttpGetIn" />
+      <wsdl:output message="tns:GetNineDayForecastInfo2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns three day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetThreeDayForecastInfoHttpGetIn" />
+      <wsdl:output message="tns:GetThreeDayForecastInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns three day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetThreeDayForecastInfo2HttpGetIn" />
+      <wsdl:output message="tns:GetThreeDayForecastInfo2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather forecast information for a valid given U.S. zipcode and day.</documentation>
+      <wsdl:input message="tns:GetDayForecastInfoHttpGetIn" />
+      <wsdl:output message="tns:GetDayForecastInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather forecast information for a valid given U.S. zipcode and day.</documentation>
+      <wsdl:input message="tns:GetDayForecastInfo2HttpGetIn" />
+      <wsdl:output message="tns:GetDayForecastInfo2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid Iraq city.</documentation>
+      <wsdl:input message="tns:GetIraqWeatherInfoHttpGetIn" />
+      <wsdl:output message="tns:GetIraqWeatherInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid Iraq city.</documentation>
+      <wsdl:input message="tns:GetIraqWeatherInfo2HttpGetIn" />
+      <wsdl:output message="tns:GetIraqWeatherInfo2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetIraqExtendedWeatherInfoHttpGetIn" />
+      <wsdl:output message="tns:GetIraqExtendedWeatherInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetIraqExtendedWeatherInfo2HttpGetIn" />
+      <wsdl:output message="tns:GetIraqExtendedWeatherInfo2HttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpPost">
+    <wsdl:operation name="GetWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetWeatherInfoHttpPostIn" />
+      <wsdl:output message="tns:GetWeatherInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetWeatherInfo2HttpPostIn" />
+      <wsdl:output message="tns:GetWeatherInfo2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns extended weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetExtendedWeatherInfoHttpPostIn" />
+      <wsdl:output message="tns:GetExtendedWeatherInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns extended weather information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetExtendedWeatherInfo2HttpPostIn" />
+      <wsdl:output message="tns:GetExtendedWeatherInfo2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetNineDayForecastInfoHttpPostIn" />
+      <wsdl:output message="tns:GetNineDayForecastInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetNineDayForecastInfo2HttpPostIn" />
+      <wsdl:output message="tns:GetNineDayForecastInfo2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns three day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetThreeDayForecastInfoHttpPostIn" />
+      <wsdl:output message="tns:GetThreeDayForecastInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns three day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetThreeDayForecastInfo2HttpPostIn" />
+      <wsdl:output message="tns:GetThreeDayForecastInfo2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather forecast information for a valid given U.S. zipcode and day.</documentation>
+      <wsdl:input message="tns:GetDayForecastInfoHttpPostIn" />
+      <wsdl:output message="tns:GetDayForecastInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather forecast information for a valid given U.S. zipcode and day.</documentation>
+      <wsdl:input message="tns:GetDayForecastInfo2HttpPostIn" />
+      <wsdl:output message="tns:GetDayForecastInfo2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid Iraq city.</documentation>
+      <wsdl:input message="tns:GetIraqWeatherInfoHttpPostIn" />
+      <wsdl:output message="tns:GetIraqWeatherInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns weather information for a valid Iraq city.</documentation>
+      <wsdl:input message="tns:GetIraqWeatherInfo2HttpPostIn" />
+      <wsdl:output message="tns:GetIraqWeatherInfo2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetIraqExtendedWeatherInfoHttpPostIn" />
+      <wsdl:output message="tns:GetIraqExtendedWeatherInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo2">
+      <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns nine day forecast information for a valid given U.S. zipcode.</documentation>
+      <wsdl:input message="tns:GetIraqExtendedWeatherInfo2HttpPostIn" />
+      <wsdl:output message="tns:GetIraqExtendedWeatherInfo2HttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceSoap" type="tns:ServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <wsdl:operation name="GetWeatherInfo">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetWeatherInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetWeatherInfoUserCredentials" part="UserCredentials" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWeatherInfo2">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetWeatherInfo2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetExtendedWeatherInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetExtendedWeatherInfoUserCredentials" part="UserCredentials" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo2">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetExtendedWeatherInfo2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetNineDayForecastInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetNineDayForecastInfoUserCredentials" part="UserCredentials" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo2">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetNineDayForecastInfo2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetThreeDayForecastInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetThreeDayForecastInfoUserCredentials" part="UserCredentials" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo2">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetThreeDayForecastInfo2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetDayForecastInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetDayForecastInfoUserCredentials" part="UserCredentials" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo2">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetDayForecastInfo2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetIraqWeatherInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetIraqWeatherInfoUserCredentials" part="UserCredentials" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo2">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetIraqWeatherInfo2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetIraqExtendedWeatherInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetIraqExtendedWeatherInfoUserCredentials" part="UserCredentials" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo2">
+      <soap:operation soapAction="http://ejse.com/WeatherService/GetIraqExtendedWeatherInfo2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpGet" type="tns:ServiceHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="GetWeatherInfo">
+      <http:operation location="/GetWeatherInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWeatherInfo2">
+      <http:operation location="/GetWeatherInfo2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo">
+      <http:operation location="/GetExtendedWeatherInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo2">
+      <http:operation location="/GetExtendedWeatherInfo2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo">
+      <http:operation location="/GetNineDayForecastInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo2">
+      <http:operation location="/GetNineDayForecastInfo2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo">
+      <http:operation location="/GetThreeDayForecastInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo2">
+      <http:operation location="/GetThreeDayForecastInfo2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo">
+      <http:operation location="/GetDayForecastInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo2">
+      <http:operation location="/GetDayForecastInfo2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo">
+      <http:operation location="/GetIraqWeatherInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo2">
+      <http:operation location="/GetIraqWeatherInfo2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo">
+      <http:operation location="/GetIraqExtendedWeatherInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo2">
+      <http:operation location="/GetIraqExtendedWeatherInfo2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpPost" type="tns:ServiceHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="GetWeatherInfo">
+      <http:operation location="/GetWeatherInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWeatherInfo2">
+      <http:operation location="/GetWeatherInfo2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo">
+      <http:operation location="/GetExtendedWeatherInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetExtendedWeatherInfo2">
+      <http:operation location="/GetExtendedWeatherInfo2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo">
+      <http:operation location="/GetNineDayForecastInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNineDayForecastInfo2">
+      <http:operation location="/GetNineDayForecastInfo2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo">
+      <http:operation location="/GetThreeDayForecastInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetThreeDayForecastInfo2">
+      <http:operation location="/GetThreeDayForecastInfo2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo">
+      <http:operation location="/GetDayForecastInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDayForecastInfo2">
+      <http:operation location="/GetDayForecastInfo2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo">
+      <http:operation location="/GetIraqWeatherInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqWeatherInfo2">
+      <http:operation location="/GetIraqWeatherInfo2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo">
+      <http:operation location="/GetIraqExtendedWeatherInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIraqExtendedWeatherInfo2">
+      <http:operation location="/GetIraqExtendedWeatherInfo2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service">
+    <documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Weather service which returns weather data for a valid given U.S. zipcode.  Register to use this service at:  http://www.ejse.com/WeatherSignup/Signup.aspx</documentation>
+    <wsdl:port name="ServiceSoap" binding="tns:ServiceSoap">
+      <soap:address location="http://www.ejse.com/WeatherService/Service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceHttpGet" binding="tns:ServiceHttpGet">
+      <http:address location="http://www.ejse.com/WeatherService/Service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceHttpPost" binding="tns:ServiceHttpPost">
+      <http:address location="http://www.ejse.com/WeatherService/Service.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
